@@ -871,7 +871,7 @@ async function loadUserData() {
         lastBonusDate = data.lastBonusDate || null;
         if (data.company) {
             userCompany = data.company;
-            publishCompany(userCompany);
+            await publishCompany(userCompany);
         }
     } else {
         loadFromLocalStorage();
@@ -1015,8 +1015,8 @@ async function loadAllUserCompanies() {
         }
     }
 
-    /* どちらも失敗した場合、自分の会社だけ表示 */
-    if (!loaded && userCompany && !existingIds.has(userCompany.id)) {
+    /* 自分の会社がまだ allStocks に無ければ追加 */
+    if (userCompany && !existingIds.has(userCompany.id)) {
         const c = userCompany;
         allStocks.push({
             id: c.id, name: c.name, ticker: c.ticker,

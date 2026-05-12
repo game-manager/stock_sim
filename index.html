@@ -164,6 +164,9 @@
         .badge-own {
             background: #1e3a5f; color: #60a5fa;
         }
+        .badge-other {
+            background: #3b1f4f; color: #c084fc;
+        }
         .stock-price-row {
             display: flex; align-items: baseline; gap: 12px;
             margin-bottom: 10px;
@@ -793,9 +796,18 @@ window.handleLogout = async function() {
     await signOut(auth);
 };
  
+function resetUserState() {
+    balance       = 10000000;
+    holdings      = {};
+    tradeHistory  = [];
+    userCompany   = null;
+    lastBonusDate = null;
+}
+
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
+        resetUserState();
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-screen').style.display = 'block';
         document.getElementById('user-email').textContent = user.email;
@@ -809,6 +821,7 @@ onAuthStateChanged(auth, async (user) => {
         initMarket();
     } else {
         currentUser = null;
+        resetUserState();
         document.getElementById('login-screen').style.display = '';
         document.getElementById('main-screen').style.display = 'none';
         if (priceInterval) { clearInterval(priceInterval); priceInterval = null; }
@@ -848,6 +861,7 @@ function loadFromLocalStorage() {
 /* ─── ユーザーデータ読み込み ─── */
 async function loadUserData() {
     const uid = currentUser.uid;
+    resetUserState();
     const snap = await get(dbRef(db, `stock_users/${uid}`));
     if (snap.exists()) {
         const data = snap.val();
@@ -857,16 +871,10 @@ async function loadUserData() {
         lastBonusDate = data.lastBonusDate || null;
         if (data.company) {
             userCompany = data.company;
+            publishCompany(userCompany);
         }
     } else {
         loadFromLocalStorage();
-        if (balance === 10000000 && Object.keys(holdings).length === 0) {
-            balance      = 10000000;
-            holdings     = {};
-            tradeHistory = [];
-            userCompany  = null;
-        }
-        try { await saveUserData(); } catch {}
     }
     saveToLocalStorage();
     updateBalanceDisplay();
@@ -884,6 +892,22 @@ async function saveUserData() {
         });
     } catch (e) {
         console.warn('Firebase save failed, data saved to localStorage:', e.message);
+    }
+}
+
+async function publishCompany(company) {
+    try {
+        await set(dbRef(db, `companies/${company.id}`), {
+            id:           company.id,
+            name:         company.name,
+            ticker:       company.ticker,
+            initialPrice: company.initialPrice,
+            createdAt:    company.createdAt,
+            ownerUid:     currentUser.uid,
+            ownerEmail:   currentUser.email,
+        });
+    } catch (e) {
+        console.warn('Failed to publish company to public list:', e.message);
     }
 }
  
@@ -921,62 +945,90 @@ function initMarket() {
  
 /* ─── 全ユーザー会社を読み込む ─── */
 async function loadAllUserCompanies() {
-    let snap;
+    const existingIds = new Set(allStocks.map(s => s.id));
+    let loaded = false;
+
+    /* まず companies/ パスから読み込み（他プレイヤーの会社も含む） */
     try {
-        snap = await get(dbRef(db, 'stock_users'));
-    } catch (e) {
-        console.warn('Could not load other companies (permission denied). Using local data only.');
-        if (userCompany) {
-            const c = userCompany;
-            const companyId = c.id;
-            if (!allStocks.find(s => s.id === companyId)) {
-                allStocks.push({
-                    id: companyId, name: c.name, ticker: c.ticker,
-                    basePrice: c.initialPrice, sector: '自社',
-                    isUserCompany: true, ownerUid: currentUser.uid,
-                });
-                stockPrices[companyId] = c.initialPrice;
-                priceHistory[companyId] = Array(21).fill(c.initialPrice).map((p, i) =>
-                    i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
-                );
-            }
-            document.getElementById('company-form').style.display = 'none';
-            document.getElementById('company-status').style.display = 'block';
-            document.getElementById('company-info').innerHTML =
-                `<strong>${c.name}</strong>（${c.ticker}）<br>` +
-                `初期株価: ¥${c.initialPrice.toLocaleString()}<br>` +
-                `現在の株価: ¥${(stockPrices[companyId] || c.initialPrice).toLocaleString()}`;
-        }
-        renderMarket();
-        return;
-    }
-    if (!snap.exists()) return;
- 
-    const users = snap.val();
-    const existingIds = new Set(FAMOUS_STOCKS.map(s => s.id));
- 
-    Object.entries(users).forEach(([uid, data]) => {
-        if (data.company && !existingIds.has(data.company.id)) {
-            const c = data.company;
-            allStocks.push({
-                id: c.id,
-                name: c.name,
-                ticker: c.ticker,
-                basePrice: c.initialPrice,
-                sector: '自社',
-                isUserCompany: true,
-                ownerUid: uid,
+        const snap = await get(dbRef(db, 'companies'));
+        if (snap.exists()) {
+            const companies = snap.val();
+            Object.values(companies).forEach(c => {
+                if (!existingIds.has(c.id)) {
+                    const isOwn = c.ownerUid === currentUser.uid;
+                    allStocks.push({
+                        id: c.id,
+                        name: c.name,
+                        ticker: c.ticker,
+                        basePrice: c.initialPrice,
+                        sector: isOwn ? '自社' : (c.ownerEmail ? c.ownerEmail.split('@')[0] : '他のプレイヤー'),
+                        isUserCompany: true,
+                        ownerUid: c.ownerUid,
+                        ownerEmail: c.ownerEmail || null,
+                    });
+                    if (!stockPrices[c.id]) {
+                        stockPrices[c.id] = c.initialPrice;
+                        priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
+                            i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
+                        );
+                    }
+                    existingIds.add(c.id);
+                }
             });
-            if (!stockPrices[c.id]) {
-                stockPrices[c.id] = c.initialPrice;
-                priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
-                    i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
-                );
-            }
-            existingIds.add(c.id);
+            loaded = true;
         }
-    });
- 
+    } catch (e) {
+        console.warn('Could not load companies from public list:', e.message);
+    }
+
+    /* companies/ が使えない場合、stock_users/ から読み込む（フォールバック） */
+    if (!loaded) {
+        try {
+            const snap = await get(dbRef(db, 'stock_users'));
+            if (snap.exists()) {
+                Object.entries(snap.val()).forEach(([uid, data]) => {
+                    if (data.company && !existingIds.has(data.company.id)) {
+                        const c = data.company;
+                        const isOwn = uid === currentUser.uid;
+                        allStocks.push({
+                            id: c.id,
+                            name: c.name,
+                            ticker: c.ticker,
+                            basePrice: c.initialPrice,
+                            sector: isOwn ? '自社' : '他のプレイヤー',
+                            isUserCompany: true,
+                            ownerUid: uid,
+                        });
+                        if (!stockPrices[c.id]) {
+                            stockPrices[c.id] = c.initialPrice;
+                            priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
+                                i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
+                            );
+                        }
+                        existingIds.add(c.id);
+                    }
+                });
+                loaded = true;
+            }
+        } catch (e) {
+            console.warn('Could not load companies from stock_users:', e.message);
+        }
+    }
+
+    /* どちらも失敗した場合、自分の会社だけ表示 */
+    if (!loaded && userCompany && !existingIds.has(userCompany.id)) {
+        const c = userCompany;
+        allStocks.push({
+            id: c.id, name: c.name, ticker: c.ticker,
+            basePrice: c.initialPrice, sector: '自社',
+            isUserCompany: true, ownerUid: currentUser.uid,
+        });
+        stockPrices[c.id] = c.initialPrice;
+        priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
+            i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
+        );
+    }
+
     if (userCompany) {
         document.getElementById('company-form').style.display = 'none';
         document.getElementById('company-status').style.display = 'block';
@@ -985,7 +1037,7 @@ async function loadAllUserCompanies() {
             `初期株価: ¥${userCompany.initialPrice.toLocaleString()}<br>` +
             `現在の株価: ¥${(stockPrices[userCompany.id] || userCompany.initialPrice).toLocaleString()}`;
     }
- 
+
     renderMarket();
 }
  
@@ -1062,7 +1114,7 @@ function renderMarket() {
                     <div class="stock-ticker">${s.ticker} · ${s.sector || ''}</div>
                 </div>
                 ${isOwn ? '<span class="stock-badge badge-own">自社</span>' :
-                  (s.isUserCompany ? '<span class="stock-badge badge-own">ユーザー企業</span>' : '')}
+                  (s.isUserCompany ? `<span class="stock-badge badge-other">${s.ownerEmail ? s.ownerEmail.split('@')[0] + 'の会社' : '他プレイヤー'}</span>` : '')}
             </div>
             <div class="stock-price-row">
                 <span class="stock-price">¥${price.toLocaleString()}</span>
@@ -1346,6 +1398,7 @@ window.createCompany = async function() {
     );
  
     await saveUserData();
+    await publishCompany(userCompany);
     renderMarket();
  
     document.getElementById('company-form').style.display = 'none';
@@ -1355,7 +1408,7 @@ window.createCompany = async function() {
         `初期株価: ¥${price.toLocaleString()}<br>` +
         `現在の株価: ¥${price.toLocaleString()}`;
  
-    showToast(`🏢 ${name} を設立しました！マーケットに上場されました`, 'success');
+    showToast(`🏢 ${name} を設立しました！他のプレイヤーも売買できます`, 'success');
 };
  
 /* ─── タブ切替 ─── */

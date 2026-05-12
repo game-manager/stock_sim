@@ -1036,6 +1036,9 @@ async function loadAllUserCompanies() {
             `<strong>${userCompany.name}</strong>（${userCompany.ticker}）<br>` +
             `初期株価: ¥${userCompany.initialPrice.toLocaleString()}<br>` +
             `現在の株価: ¥${(stockPrices[userCompany.id] || userCompany.initialPrice).toLocaleString()}`;
+    } else {
+        document.getElementById('company-form').style.display = '';
+        document.getElementById('company-status').style.display = 'none';
     }
 
     renderMarket();

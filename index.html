@@ -496,6 +496,50 @@
             letter-spacing: 1px;
         }
         .bonus-close-btn:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+
+        /* ─── 警告モーダル ─── */
+        .warning-modal-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000c; z-index: 260;
+            align-items: center; justify-content: center;
+        }
+        .warning-modal-overlay.show { display: flex; }
+        .warning-modal {
+            background: linear-gradient(135deg, #1e293b, #111827);
+            border: 2px solid #dc2626;
+            border-radius: 16px;
+            padding: 32px 40px;
+            text-align: center;
+            box-shadow: 0 0 60px #dc262633;
+            max-width: 440px; width: 100%;
+        }
+        .warning-icon { font-size: 48px; margin-bottom: 12px; }
+        .warning-title {
+            color: #dc2626; font-size: 20px;
+            font-weight: bold; margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+        .warning-message {
+            color: #e0e8f0; font-size: 14px;
+            margin-bottom: 8px; line-height: 1.6;
+            background: #0f172a; border-radius: 8px;
+            padding: 14px 18px; text-align: left;
+            max-height: 200px; overflow-y: auto;
+        }
+        .warning-meta {
+            color: #6b7280; font-size: 11px;
+            margin-bottom: 20px;
+        }
+        .warning-close-btn {
+            padding: 10px 40px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: bold;
+            cursor: pointer; transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .warning-close-btn:hover { background: linear-gradient(135deg, #ef4444, #dc2626); }
  
         /* ─── レスポンシブ ─── */
         @media (max-width: 640px) {
@@ -695,6 +739,17 @@
         <button class="bonus-close-btn" onclick="closeBonusModal()">受け取る</button>
     </div>
 </div>
+
+<!-- 警告モーダル -->
+<div class="warning-modal-overlay" id="warning-modal">
+    <div class="warning-modal">
+        <div class="warning-icon">⚠️</div>
+        <div class="warning-title">管理者からの警告</div>
+        <div class="warning-message" id="warning-text"></div>
+        <div class="warning-meta" id="warning-meta"></div>
+        <button class="warning-close-btn" onclick="acknowledgeWarning()">確認しました</button>
+    </div>
+</div>
  
 <!-- ===== Firebase + ロジック ===== -->
 <script type="module">
@@ -704,7 +759,7 @@ import {
     signOut, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
-    getDatabase, ref as dbRef, set, get, push, onValue, update
+    getDatabase, ref as dbRef, set, get, push, onValue, update, remove
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
  
 const firebaseConfig = {
@@ -819,6 +874,7 @@ onAuthStateChanged(auth, async (user) => {
             loadFromLocalStorage();
         }
         checkLoginBonus();
+        checkWarnings();
         initMarket();
     } else {
         currentUser = null;
@@ -1446,6 +1502,50 @@ async function checkLoginBonus() {
  
 window.closeBonusModal = function() {
     document.getElementById('bonus-modal').classList.remove('show');
+};
+
+/* ─── 警告チェック ─── */
+let pendingWarnings = [];
+
+async function checkWarnings() {
+    if (!currentUser) return;
+    try {
+        const snap = await get(dbRef(db, `warnings/${currentUser.uid}`));
+        if (!snap.exists()) return;
+        const warnings = snap.val();
+        pendingWarnings = Object.entries(warnings)
+            .filter(([, w]) => !w.acknowledged)
+            .sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+        showNextWarning();
+    } catch (e) {
+        console.warn('Warning check failed:', e.message);
+    }
+}
+
+function showNextWarning() {
+    if (pendingWarnings.length === 0) return;
+    const [wid, w] = pendingWarnings[0];
+    document.getElementById('warning-text').textContent = w.message;
+    const date = w.timestamp ? new Date(w.timestamp).toLocaleString('ja-JP') : '';
+    document.getElementById('warning-meta').textContent = date ? `送信日時: ${date}` : '';
+    document.getElementById('warning-modal').dataset.warningId = wid;
+    document.getElementById('warning-modal').classList.add('show');
+}
+
+window.acknowledgeWarning = async function() {
+    const wid = document.getElementById('warning-modal').dataset.warningId;
+    if (wid && currentUser) {
+        try {
+            await set(dbRef(db, `warnings/${currentUser.uid}/${wid}/acknowledged`), true);
+        } catch (e) {
+            console.warn('Warning acknowledge failed:', e.message);
+        }
+    }
+    document.getElementById('warning-modal').classList.remove('show');
+    pendingWarnings.shift();
+    if (pendingWarnings.length > 0) {
+        setTimeout(showNextWarning, 500);
+    }
 };
  
 /* ─── トースト ─── */

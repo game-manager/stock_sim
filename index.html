@@ -1036,7 +1036,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('user-email').textContent = user.email;
         
         // 管理者判定
-        isAdmin = ADMIN_UIDS.includes(user.uid) || user.email === 'admin@example.com';
+        isAdmin = ADMIN_UIDS.includes(user.uid) || user.email.toLowerCase() === 'admin@example.com';
         if (isAdmin) {
             document.getElementById('admin-badge').style.display = 'inline-block';
             document.getElementById('admin-tab').style.display = 'block';

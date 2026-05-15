@@ -647,7 +647,33 @@
             .admin-grid { grid-template-columns: 1fr; }
             .player-actions { flex-direction: column; }
         }
-    </style>
+    
+        /* ─── ニュースバナー ─── */
+        #news-banner {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 500;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            transform: translateY(-100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        #news-banner.show { transform: translateY(0); }
+        #news-banner.positive { background: linear-gradient(135deg, #064e3b, #065f46); color: #34d399; border-bottom: 2px solid #34d399; }
+        #news-banner.negative { background: linear-gradient(135deg, #450a0a, #7f1d1d); color: #f87171; border-bottom: 2px solid #f87171; }
+        #news-banner.neutral  { background: linear-gradient(135deg, #1e1b4b, #312e81); color: #a5b4fc; border-bottom: 2px solid #818cf8; }
+        .news-icon { font-size: 18px; }
+        .news-label { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.15); letter-spacing: 1px; }
+        .news-ticker-affected { font-size: 11px; opacity: 0.8; margin-left: auto; }
+        .news-impact { font-size: 13px; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: rgba(0,0,0,0.2); }
+
+</style>
 </head>
 <body>
  
@@ -680,6 +706,16 @@
  
 <!-- ===== メイン画面 ===== -->
 <div id="main-screen">
+
+    <!-- ニュースイベントバナー -->
+    <div id="news-banner">
+        <span class="news-icon" id="news-icon">📰</span>
+        <span class="news-label">速報</span>
+        <span id="news-text">ニュース本文</span>
+        <span class="news-ticker-affected" id="news-tickers"></span>
+        <span class="news-impact" id="news-impact"></span>
+    </div>
+
     <!-- ヘッダー -->
     <div class="header">
         <div class="header-left">
@@ -1383,6 +1419,7 @@ function initMarket() {
     renderMarket();
     updateMarketTime();
     setInterval(updateMarketTime, 1000);
+    initNewsEvents();
 }
  
 /* ─── 全ユーザー会社を読み込む ─── */
@@ -1899,6 +1936,138 @@ function showToast(msg, type) {
     el.className   = `toast ${type} show`;
     setTimeout(() => el.classList.remove('show'), 3000);
 }
+
+/* ─── ニュースイベント ─── */
+const NEWS_EVENTS = [
+    // ポジティブ
+    { type: 'positive', icon: '🚀', text: '好調な決算発表！予想を大幅に上回る増益を記録', tickers: ['AAPL','MSFT'], impact: +0.08, label: '+8%' },
+    { type: 'positive', icon: '💡', text: '新製品発表！革命的なAIチップを世界初公開', tickers: ['NVDA'], impact: +0.12, label: '+12%' },
+    { type: 'positive', icon: '🤝', text: '大型買収合意！業界トップとの戦略的提携が成立', tickers: ['GOOGL','META'], impact: +0.07, label: '+7%' },
+    { type: 'positive', icon: '📈', text: '米国市場全体が急騰！FRBが利下げを発表', tickers: ['AAPL','AMZN','MSFT','TSLA'], impact: +0.05, label: '+5%' },
+    { type: 'positive', icon: '⚡', text: 'EV需要が爆増！欧州で大規模な補助金政策を発表', tickers: ['TSLA'], impact: +0.10, label: '+10%' },
+    { type: 'positive', icon: '🎮', text: '新型ゲーム機が爆発的ヒット！初日で売上記録更新', tickers: ['NTDOY','SONY'], impact: +0.09, label: '+9%' },
+    { type: 'positive', icon: '📱', text: 'スマートフォン世界シェアが過去最高を更新', tickers: ['AAPL'], impact: +0.06, label: '+6%' },
+    { type: 'positive', icon: '🌐', text: 'クラウド事業の売上が前年比200%増と報告', tickers: ['AMZN','MSFT','GOOGL'], impact: +0.06, label: '+6%' },
+    { type: 'positive', icon: '💹', text: '日経平均が大幅上昇！国内株全体に恩恵', tickers: ['TM','SONY','SBG','KDDI'], impact: +0.05, label: '+5%' },
+    { type: 'positive', icon: '🏆', text: 'AIサービスが月間ユーザー1億人を突破', tickers: ['GOOGL','META','MSFT'], impact: +0.07, label: '+7%' },
+    // ネガティブ
+    { type: 'negative', icon: '📉', text: '米中貿易摩擦が再燃！関税引き上げが決定', tickers: ['AAPL','AMZN'], impact: -0.07, label: '-7%' },
+    { type: 'negative', icon: '⚠️', text: '大規模な個人情報漏洩が発覚！調査開始', tickers: ['META','GOOGL'], impact: -0.09, label: '-9%' },
+    { type: 'negative', icon: '🔻', text: '予想を下回る決算！売上高が前年比20%減少', tickers: ['TSLA'], impact: -0.11, label: '-11%' },
+    { type: 'negative', icon: '💥', text: 'FRBが利上げを発表！成長株に売り圧力', tickers: ['AAPL','MSFT','NVDA','AMZN'], impact: -0.05, label: '-5%' },
+    { type: 'negative', icon: '🚨', text: '半導体供給不足が深刻化！生産ラインに影響', tickers: ['NVDA','AAPL','MSFT'], impact: -0.06, label: '-6%' },
+    { type: 'negative', icon: '📵', text: '独占禁止法違反で巨額罰金！規制当局が提訴', tickers: ['GOOGL','META'], impact: -0.08, label: '-8%' },
+    { type: 'negative', icon: '🌋', text: '自然災害で工場が操業停止！生産に影響', tickers: ['TM','SONY'], impact: -0.07, label: '-7%' },
+    { type: 'negative', icon: '📊', text: '米国GDP成長率が予想を大幅に下回る', tickers: ['AAPL','AMZN','GOOGL','MSFT'], impact: -0.04, label: '-4%' },
+    { type: 'negative', icon: '💸', text: 'CEOが突然辞任を表明！経営陣に混乱', tickers: ['TSLA'], impact: -0.10, label: '-10%' },
+    { type: 'negative', icon: '🔒', text: 'サイバー攻撃でシステム停止！復旧に時間', tickers: ['AMZN','MSFT'], impact: -0.06, label: '-6%' },
+    // ニュートラル
+    { type: 'neutral', icon: '🔄', text: '市場は様子見ムード。主要指標は横ばいで推移', tickers: [], impact: 0, label: '±0%' },
+    { type: 'neutral', icon: '📰', text: 'FRBが政策金利を据え置きに決定。市場は反応薄', tickers: [], impact: 0, label: '±0%' },
+    { type: 'neutral', icon: '🌍', text: 'G7サミット開催。各国首脳が経済安定を宣言', tickers: [], impact: 0.01, label: '+1%' },
+];
+
+let newsEventInterval = null;
+let newsImpactMap = {};  // stockId -> 残り影響ティック数とimpact
+
+function triggerNewsEvent() {
+    const event = NEWS_EVENTS[Math.floor(Math.random() * NEWS_EVENTS.length)];
+    // 対象銘柄を決定（ユーザー会社はランダムで混ぜる）
+    let targetTickers = [...event.tickers];
+    // ユーザー会社も一定確率でイベントに巻き込む
+    if (Math.random() < 0.3) {
+        const userStocks = allStocks.filter(s => s.isUserCompany);
+        if (userStocks.length > 0) {
+            const picked = userStocks[Math.floor(Math.random() * userStocks.length)];
+            targetTickers.push(picked.ticker);
+        }
+    }
+
+    // 該当銘柄を特定してインパクト適用
+    const affectedStocks = allStocks.filter(s => targetTickers.includes(s.ticker));
+    affectedStocks.forEach(s => {
+        const mult = event.type === 'neutral' ? 1 : (1 + event.impact);
+        const oldPrice = stockPrices[s.id];
+        const newPrice = Math.max(1, Math.round(oldPrice * mult));
+        stockPrices[s.id] = newPrice;
+        if (!priceHistory[s.id]) priceHistory[s.id] = [];
+        priceHistory[s.id].push(newPrice);
+        if (priceHistory[s.id].length > 21) priceHistory[s.id].shift();
+        // 今後3〜5ティックの間、影響を持続させる
+        newsImpactMap[s.id] = {
+            impact: event.impact * 0.3,
+            ticks: 3 + Math.floor(Math.random() * 3)
+        };
+    });
+
+    // バナー表示
+    showNewsBanner(event, affectedStocks);
+
+    // UI更新
+    renderMarket();
+    updatePortfolio();
+}
+
+function showNewsBanner(event, affectedStocks) {
+    const banner = document.getElementById('news-banner');
+    const icon   = document.getElementById('news-icon');
+    const text   = document.getElementById('news-text');
+    const tickers = document.getElementById('news-tickers');
+    const impact = document.getElementById('news-impact');
+
+    icon.textContent   = event.icon;
+    text.textContent   = event.text;
+    impact.textContent = event.label;
+    tickers.textContent = affectedStocks.length > 0
+        ? '影響: ' + affectedStocks.map(s => s.ticker).join(' / ')
+        : '';
+
+    banner.className = `show ${event.type}`;
+
+    // 5秒後に非表示
+    clearTimeout(banner._hideTimer);
+    banner._hideTimer = setTimeout(() => {
+        banner.classList.remove('show');
+        setTimeout(() => { banner.className = ''; }, 450);
+    }, 5000);
+}
+
+function initNewsEvents() {
+    if (newsEventInterval) clearInterval(newsEventInterval);
+    // 30〜90秒ランダム間隔で発生させるためにランダム遅延を使う再帰タイマー
+    function scheduleNext() {
+        const delay = 30000 + Math.random() * 60000; // 30〜90秒
+        newsEventInterval = setTimeout(() => {
+            triggerNewsEvent();
+            scheduleNext();
+        }, delay);
+    }
+    scheduleNext();
+}
+
+// tickPricesにニュース持続効果を追加するパッチ
+const _origTickPrices = tickPrices;
+function tickPrices() {
+    _origTickPrices();
+    // ニュースによる持続影響
+    let anyEffect = false;
+    Object.keys(newsImpactMap).forEach(id => {
+        const entry = newsImpactMap[id];
+        if (entry.ticks <= 0) { delete newsImpactMap[id]; return; }
+        const prev = stockPrices[id];
+        const drift = entry.impact * (0.3 + Math.random() * 0.7);
+        const newP = Math.max(1, Math.round(prev * (1 + drift)));
+        stockPrices[id] = newP;
+        if (priceHistory[id]) {
+            priceHistory[id].push(newP);
+            if (priceHistory[id].length > 21) priceHistory[id].shift();
+        }
+        entry.ticks--;
+        anyEffect = true;
+    });
+    if (anyEffect) { renderMarket(); updatePortfolio(); }
+}
+
 </script>
 </body>
 </html>

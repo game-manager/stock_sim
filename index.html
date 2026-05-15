@@ -1234,9 +1234,10 @@ onAuthStateChanged(auth, async (user) => {
         if (isAdmin) {
             document.getElementById('admin-badge').style.display = 'inline-block';
             document.getElementById('admin-tab').style.display = 'block';
-            document.getElementById('admin-btn-market').style.display = 'block';
             loadAllPlayers();
         }
+        // 企業管理ボタンは全ユーザーに表示
+        document.getElementById('admin-btn-market').style.display = 'block';
         
         try {
             await loadUserData();

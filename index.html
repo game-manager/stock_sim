@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -635,43 +636,6 @@
             letter-spacing: 1px;
         }
         .warning-close-btn:hover { background: linear-gradient(135deg, #fca5a5, #f87171); }
-
-        /* ─── ニュースイベントバナー ─── */
-        #news-banner {
-            position: fixed;
-            top: 70px; left: 50%; transform: translateX(-50%) translateY(-120px);
-            z-index: 400;
-            min-width: 320px; max-width: 520px; width: 90%;
-            background: #1e293b;
-            border-radius: 14px;
-            padding: 16px 22px 14px 18px;
-            box-shadow: 0 8px 40px #000c;
-            transition: transform 0.45s cubic-bezier(.22,1,.36,1), opacity 0.3s;
-            opacity: 0;
-            display: flex; align-items: flex-start; gap: 14px;
-        }
-        #news-banner.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        #news-banner.up   { border-left: 4px solid #34d399; }
-        #news-banner.down { border-left: 4px solid #f87171; }
-        .news-banner-icon { font-size: 28px; flex-shrink: 0; line-height: 1.2; }
-        .news-banner-body { flex: 1; }
-        .news-banner-title {
-            font-size: 13px; font-weight: bold; letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        .news-banner-title.up   { color: #34d399; }
-        .news-banner-title.down { color: #f87171; }
-        .news-banner-msg {
-            font-size: 13px; color: #cbd5e1; line-height: 1.5;
-        }
-        .news-banner-impact {
-            font-size: 12px; margin-top: 5px; font-weight: bold;
-        }
-        .news-banner-impact.up   { color: #34d399; }
-        .news-banner-impact.down { color: #f87171; }
  
         /* ─── レスポンシブ ─── */
         @media (max-width: 640px) {
@@ -938,16 +902,6 @@
  
 <!-- トースト -->
 <div class="toast" id="toast"></div>
-
-<!-- ニュースイベントバナー -->
-<div id="news-banner">
-    <div class="news-banner-icon" id="news-banner-icon">📰</div>
-    <div class="news-banner-body">
-        <div class="news-banner-title" id="news-banner-title">ニュース速報</div>
-        <div class="news-banner-msg" id="news-banner-msg"></div>
-        <div class="news-banner-impact" id="news-banner-impact"></div>
-    </div>
-</div>
  
 <!-- ログインボーナスモーダル -->
 <div class="bonus-modal-overlay" id="bonus-modal">
@@ -1012,33 +966,939 @@ const FAMOUS_STOCKS = [
     { id: 'KDDI',  name: 'KDDI',             ticker: 'KDDI',  basePrice: 4750,   sector: '通信' },
 ];
 
-/* ─── ニュースイベント定義 ─── */
-const NEWS_EVENTS = [
-    // Apple
-    { stockId: 'AAPL', direction: 'up',   impact: 0.08, icon: '🍎', title: '📈 Apple 急騰！', msg: 'Appleが革新的な新製品を発表！売上が急上昇し、投資家の期待が高まっています。' },
-    { stockId: 'AAPL', direction: 'up',   impact: 0.06, icon: '💰', title: '📈 Apple 好決算！', msg: 'Appleが過去最高の四半期決算を発表。iPhoneの販売台数が予想を大幅に上回りました。' },
-    { stockId: 'AAPL', direction: 'down', impact: 0.07, icon: '⚠️', title: '📉 Apple 急落！', msg: 'Appleのサプライチェーン問題が発覚。部品不足により新製品の出荷が遅延する見通しです。' },
-    { stockId: 'AAPL', direction: 'down', impact: 0.05, icon: '🚨', title: '📉 Apple に逆風！', msg: '規制当局がAppleのApp Store手数料に対して独占禁止法違反の調査を開始しました。' },
-    // Google
-    { stockId: 'GOOGL', direction: 'up',   impact: 0.07, icon: '🔍', title: '📈 Google AI革命！', msg: 'GoogleがAI検索機能の大幅アップデートを発表。広告収益が急増する見通しです。' },
-    { stockId: 'GOOGL', direction: 'down', impact: 0.06, icon: '⚖️', title: '📉 Google 規制リスク！', msg: 'EUがGoogleに対し大規模な独占禁止法違反の制裁金を課すことを決定しました。' },
-    // Amazon
-    { stockId: 'AMZN', direction: 'up',   impact: 0.07, icon: '📦', title: '📈 Amazon 絶好調！', msg: 'AmazonのAWSクラウド事業が前年比50%成長。プライム会員数も過去最高を更新しました。' },
-    { stockId: 'AMZN', direction: 'down', impact: 0.06, icon: '🏭', title: '📉 Amazon に逆風！', msg: 'Amazon倉庫でストライキが発生。物流業務の停止により配送遅延が生じています。' },
-    // Microsoft
-    { stockId: 'MSFT', direction: 'up',   impact: 0.06, icon: '💻', title: '📈 Microsoft 躍進！', msg: 'MicrosoftのCopilot AIが企業顧客に爆発的に普及。クラウド収益が急拡大しています。' },
-    { stockId: 'MSFT', direction: 'down', impact: 0.05, icon: '🔒', title: '📉 Microsoft セキュリティ問題！', msg: 'Microsoftの主要サービスで大規模なセキュリティ脆弱性が発見され、株価が下落しています。' },
-    // Tesla
-    { stockId: 'TSLA', direction: 'up',   impact: 0.10, icon: '⚡', title: '📈 Tesla 大躍進！', msg: 'Teslaが完全自動運転の政府認可を取得！EV市場でのシェア拡大が期待されています。' },
-    { stockId: 'TSLA', direction: 'down', impact: 0.09, icon: '🚗', title: '📉 Tesla 大量リコール！', msg: 'Teslaが100万台以上のリコールを発表。バッテリー問題が安全性への懸念を引き起こしています。' },
-    // Meta
-    { stockId: 'META', direction: 'up',   impact: 0.07, icon: '🥽', title: '📈 Meta VR爆発的成長！', msg: 'MetaのVRヘッドセットが世界的ヒット。メタバース事業への投資家の期待が急上昇しています。' },
-    { stockId: 'META', direction: 'down', impact: 0.08, icon: '📵', title: '📉 Meta ユーザー流出！', msg: 'Metaの主要SNSでユーザー離れが加速。若年層の利用率が大幅に低下したと報告されています。' },
-    // NVIDIA
-    { stockId: 'NVDA', direction: 'up',   impact: 0.12, icon: '🤖', title: '📈 NVIDIA AI需要爆発！', msg: 'AI向けGPUの需要が爆発的に拡大。NVIDIAの受注残が過去最高水準に達しました。' },
-    { stockId: 'NVDA', direction: 'down', impact: 0.09, icon: '🇨🇳', title: '📉 NVIDIA 輸出規制！', msg: '米政府がNVIDIAの最先端GPUの中国への輸出を追加規制。売上への影響が懸念されています。' },
-    // Toyota
-    { stockId: 'TM', direction: 'up',   impact: 0.06, icon: '🚙', title: '📈 トヨタ 好調！', msg: 'トヨタのハイブリッド車が世界的に爆売れ。円安効果も加わり業績が大幅に改善しています。' },
-    { stockId: 'TM', direction: 'down', impact: 0.05, icon: '🏭', title: '📉 トヨタ 生産停止！', msg: 'トヨタの主要工場でシステム障害が発生。一時的な生産停止により納期遅延が生じています。' },
-    // Sony
-    { stockId: 'SONY', direction: 'up',   impact: 0.07, icon: '🎮', title: '📈 ソニー PlayStation独走！', msg: 'PlayStation 6の予約が開始直
+/* ─── 管理者UID ─── */
+const ADMIN_UIDS = ['4vhVBCQR3oMKQrTpEgY49AjWW7U2'];
+
+/* ─── グローバル状態 ─── */
+let currentUser   = null;
+let isLoginMode   = true;
+let isAdmin       = false;
+let balance        = 10000000;
+let holdings       = {};
+let tradeHistory   = [];
+let stockPrices    = {};
+let priceHistory   = {};
+let userCompany    = null;
+let tradeMode      = null;
+let tradeStockId   = null;
+let priceInterval  = null;
+let allStocks      = [...FAMOUS_STOCKS];
+let marketFilter   = 'real';
+let lastBonusDate  = null;
+let allPlayers     = {};
+let currentUsername = '';
+ 
+/* ─── Firebase認証 ─── */
+window.toggleAuthMode = function() {
+    isLoginMode = !isLoginMode;
+    document.getElementById('auth-btn').textContent = isLoginMode ? 'ログイン' : '新規登録';
+    document.getElementById('auth-toggle-text').textContent =
+        isLoginMode ? 'アカウントをお持ちでない方は' : 'すでにアカウントをお持ちの方は';
+    document.getElementById('auth-toggle-link').textContent =
+        isLoginMode ? '新規登録' : 'ログイン';
+    document.getElementById('auth-error').textContent = '';
+    // ユーザー名フィールドの表示切替
+    document.getElementById('username-group').style.display = isLoginMode ? 'none' : 'block';
+};
+ 
+window.handleAuth = async function() {
+    const email    = document.getElementById('auth-email').value.trim();
+    const pass     = document.getElementById('auth-password').value;
+    const username = document.getElementById('auth-username').value.trim();
+    const errEl    = document.getElementById('auth-error');
+    errEl.textContent = '';
+ 
+    if (!email || !pass) { errEl.textContent = 'メールとパスワードを入力してください'; return; }
+    if (pass.length < 6) { errEl.textContent = 'パスワードは6文字以上です'; return; }
+    if (!isLoginMode && !username) { errEl.textContent = 'ユーザー名を入力してください'; return; }
+    if (!isLoginMode && username.length > 20) { errEl.textContent = 'ユーザー名は20文字以内にしてください'; return; }
+ 
+    try {
+        if (isLoginMode) {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } else {
+            const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            // 新規登録時: ユーザー名をFirebaseに保存
+            await set(dbRef(db, `stock_users/${cred.user.uid}`), {
+                username: username,
+                email: email,
+                balance: 10000000,
+                holdings: {},
+                lastBonusDate: null,
+            });
+        }
+    } catch (e) {
+        const msgs = {
+            'auth/user-not-found':        'ユーザーが見つかりません',
+            'auth/wrong-password':         'パスワードが正しくありません',
+            'auth/invalid-credential':     'メールまたはパスワードが正しくありません',
+            'auth/email-already-in-use':   'このメールは既に登録されています',
+            'auth/invalid-email':          'メールアドレスの形式が正しくありません',
+            'auth/weak-password':          'パスワードをもっと強くしてください',
+        };
+        errEl.textContent = msgs[e.code] || e.message;
+    }
+};
+ 
+window.handleLogout = async function() {
+    await signOut(auth);
+};
+ 
+function resetUserState() {
+    balance       = 10000000;
+    holdings      = {};
+    tradeHistory  = [];
+    userCompany   = null;
+    lastBonusDate = null;
+    currentUsername = '';
+}
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        resetUserState();
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-screen').style.display = 'block';
+        document.getElementById('user-email').textContent = user.email;
+        
+        // 管理者判定
+        isAdmin = ADMIN_UIDS.includes(user.uid) || user.email.toLowerCase() === 'admin@example.com';
+        if (isAdmin) {
+            document.getElementById('admin-badge').style.display = 'inline-block';
+            document.getElementById('admin-tab').style.display = 'block';
+            loadAllPlayers();
+        }
+        
+        try {
+            await loadUserData();
+        } catch (e) {
+            console.warn('Firebase load failed, using localStorage fallback:', e.message);
+            loadFromLocalStorage();
+        }
+        checkLoginBonus();
+        initMarket();
+    } else {
+        currentUser = null;
+        isAdmin = false;
+        resetUserState();
+        document.getElementById('login-screen').style.display = '';
+        document.getElementById('main-screen').style.display = 'none';
+        document.getElementById('admin-badge').style.display = 'none';
+        document.getElementById('admin-tab').style.display = 'none';
+        document.getElementById('user-name-display').textContent = '';
+        if (priceInterval) { clearInterval(priceInterval); priceInterval = null; }
+    }
+});
+ 
+/* ─── localStorage ヘルパー ─── */
+function getStorageKey() {
+    return `stock_sim_${currentUser.uid}`;
+}
+ 
+function saveToLocalStorage() {
+    const key = getStorageKey();
+    localStorage.setItem(key, JSON.stringify({
+        balance, holdings, company: userCompany || null,
+        history: tradeHistory,
+        lastBonusDate: lastBonusDate || null,
+        username: currentUsername || '',
+    }));
+}
+ 
+function loadFromLocalStorage() {
+    const key = getStorageKey();
+    const raw = localStorage.getItem(key);
+    if (raw) {
+        try {
+            const data = JSON.parse(raw);
+            balance      = data.balance ?? 10000000;
+            holdings     = data.holdings ?? {};
+            tradeHistory = data.history ?? [];
+            lastBonusDate = data.lastBonusDate || null;
+            currentUsername = data.username || '';
+            if (data.company) userCompany = data.company;
+        } catch { /* corrupt data, use defaults */ }
+    }
+    updateBalanceDisplay();
+    updateUsernameDisplay();
+}
+ 
+/* ─── ユーザーデータ読み込み ─── */
+async function loadUserData() {
+    const uid = currentUser.uid;
+    resetUserState();
+    const snap = await get(dbRef(db, `stock_users/${uid}`));
+    if (snap.exists()) {
+        const data = snap.val();
+        balance      = data.balance ?? 10000000;
+        holdings     = data.holdings ?? {};
+        tradeHistory = data.history ? Object.values(data.history) : [];
+        lastBonusDate = data.lastBonusDate || null;
+        currentUsername = data.username || '';
+        if (data.company) {
+            userCompany = data.company;
+            await publishCompany(userCompany);
+        }
+    } else {
+        loadFromLocalStorage();
+    }
+    saveToLocalStorage();
+    updateBalanceDisplay();
+    updateUsernameDisplay();
+}
+ 
+function updateUsernameDisplay() {
+    const nameEl = document.getElementById('user-name-display');
+    if (currentUsername) {
+        nameEl.textContent = `👤 ${currentUsername}`;
+    } else {
+        nameEl.textContent = '';
+    }
+}
+
+async function saveUserData() {
+    const uid = currentUser.uid;
+    saveToLocalStorage();
+    try {
+        await set(dbRef(db, `stock_users/${uid}`), {
+            username: currentUsername || '',
+            email: currentUser.email,
+            balance,
+            holdings,
+            company: userCompany || null,
+            lastBonusDate: lastBonusDate || null,
+        });
+    } catch (e) {
+        console.warn('Firebase save failed, data saved to localStorage:', e.message);
+    }
+}
+
+async function publishCompany(company) {
+    try {
+        await set(dbRef(db, `companies/${company.id}`), {
+            id:           company.id,
+            name:         company.name,
+            ticker:       company.ticker,
+            initialPrice: company.initialPrice,
+            createdAt:    company.createdAt,
+            ownerUid:     currentUser.uid,
+            ownerEmail:   currentUser.email,
+            ownerUsername: currentUsername || '',
+        });
+    } catch (e) {
+        console.warn('Failed to publish company to public list:', e.message);
+    }
+}
+ 
+async function saveTradeToHistory(trade) {
+    const uid = currentUser.uid;
+    tradeHistory.push(trade);
+    saveToLocalStorage();
+    try {
+        await push(dbRef(db, `stock_users/${uid}/history`), trade);
+    } catch (e) {
+        console.warn('Firebase history save failed:', e.message);
+    }
+}
+
+/* ─── 管理者機能 ─── */
+async function loadAllPlayers() {
+    try {
+        const snap = await get(dbRef(db, 'stock_users'));
+        if (snap.exists()) {
+            allPlayers = snap.val();
+            renderPlayersTable();
+        }
+    } catch (e) {
+        console.warn('Failed to load players:', e.message);
+    }
+}
+
+function renderPlayersTable() {
+    const body = document.getElementById('players-body');
+    const rows = [];
+    
+    Object.entries(allPlayers).forEach(([uid, data]) => {
+        const username = data.username || '（未設定）';
+        const email = data.email || 'Unknown';
+        const playerBalance = data.balance ?? 10000000;
+        rows.push(`
+            <tr>
+                <td style="color:#e0e8f0; font-weight:bold;">${username}</td>
+                <td>${email}</td>
+                <td style="font-family: monospace; font-size: 11px; color: #6b7280;">${uid.substring(0, 16)}...</td>
+                <td>¥${playerBalance.toLocaleString()}</td>
+                <td>
+                    <div class="player-actions">
+                        <button class="player-action-btn warn" onclick="openWarnForm('${uid}', '${username}')">警告</button>
+                        <button class="player-action-btn delete" onclick="deletePlayer('${uid}', '${username}')">削除</button>
+                    </div>
+                </td>
+            </tr>
+        `);
+    });
+    
+    body.innerHTML = rows.length ? rows.join('') :
+        '<tr><td colspan="5" style="text-align:center;color:#6b7280;padding:32px;">プレイヤーがいません</td></tr>';
+}
+
+window.addPlayer = async function() {
+    if (!isAdmin) { showToast('管理者のみ実行可能です', 'error'); return; }
+    
+    const email = document.getElementById('new-player-email').value.trim();
+    const bal = parseInt(document.getElementById('new-player-balance').value) || 10000000;
+    
+    if (!email) { showToast('メールアドレスを入力してください', 'error'); return; }
+    if (!email.includes('@')) { showToast('有効なメールアドレスを入力してください', 'error'); return; }
+    
+    try {
+        const newUid = 'user_' + Date.now();
+        await set(dbRef(db, `stock_users/${newUid}`), {
+            username: '',
+            email: email,
+            balance: bal,
+            holdings: {},
+            history: {},
+            lastBonusDate: null,
+        });
+        
+        showToast(`✅ プレイヤー ${email} を追加しました`, 'success');
+        document.getElementById('new-player-email').value = '';
+        document.getElementById('new-player-balance').value = '10000000';
+        await loadAllPlayers();
+    } catch (e) {
+        showToast('プレイヤー追加に失敗しました: ' + e.message, 'error');
+    }
+};
+
+window.adjustPlayerBalance = async function() {
+    if (!isAdmin) { showToast('管理者のみ実行可能です', 'error'); return; }
+    
+    const uid = document.getElementById('adjust-player-uid').value.trim();
+    const amount = parseInt(document.getElementById('adjust-amount').value);
+    
+    if (!uid) { showToast('プレイヤーUIDを入力してください', 'error'); return; }
+    if (isNaN(amount)) { showToast('増減額を入力してください', 'error'); return; }
+    
+    try {
+        const snap = await get(dbRef(db, `stock_users/${uid}`));
+        if (!snap.exists()) { showToast('プレイヤーが見つかりません', 'error'); return; }
+        
+        const data = snap.val();
+        const currentBalance = data.balance ?? 10000000;
+        const newBalance = Math.max(0, currentBalance + amount);
+        
+        await update(dbRef(db, `stock_users/${uid}`), { balance: newBalance });
+        
+        const amountStr = amount >= 0 ? `+¥${amount.toLocaleString()}` : `-¥${Math.abs(amount).toLocaleString()}`;
+        showToast(`✅ 残高を調整しました (${amountStr})`, 'success');
+        document.getElementById('adjust-player-uid').value = '';
+        document.getElementById('adjust-amount').value = '';
+        await loadAllPlayers();
+    } catch (e) {
+        showToast('残高調整に失敗しました: ' + e.message, 'error');
+    }
+};
+
+window.openWarnForm = function(uid, name) {
+    document.getElementById('warn-player-uid').value = uid;
+    document.getElementById('warn-message').value = '迷惑行為が検出されました。ルール違反の行為は禁止されています。';
+    showToast(`⚠️ ${name} への警告を準備しました`, 'info');
+};
+
+window.showPlayerWarning = async function() {
+    if (!isAdmin) { showToast('管理者のみ実行可能です', 'error'); return; }
+    
+    const uid = document.getElementById('warn-player-uid').value.trim();
+    const message = document.getElementById('warn-message').value.trim();
+    
+    if (!uid) { showToast('プレイヤーUIDを入力してください', 'error'); return; }
+    if (!message) { showToast('警告メッセージを入力してください', 'error'); return; }
+    
+    try {
+        await set(dbRef(db, `warnings/${uid}`), {
+            message: message,
+            timestamp: Date.now(),
+            adminUid: currentUser.uid,
+        });
+        
+        showToast(`⚠️ 警告を送信しました`, 'success');
+        document.getElementById('warn-player-uid').value = '';
+        document.getElementById('warn-message').value = '';
+    } catch (e) {
+        showToast('警告送信に失敗しました: ' + e.message, 'error');
+    }
+};
+
+window.deletePlayer = async function(uid, name) {
+    if (!isAdmin) { showToast('管理者のみ実行可能です', 'error'); return; }
+    
+    if (!confirm(`プレイヤー「${name}」を削除してもよろしいですか？この操作は取り消せません。`)) return;
+    
+    try {
+        await set(dbRef(db, `stock_users/${uid}`), null);
+        showToast(`✅ プレイヤー「${name}」を削除しました`, 'success');
+        await loadAllPlayers();
+    } catch (e) {
+        showToast('プレイヤー削除に失敗しました: ' + e.message, 'error');
+    }
+};
+
+window.closeWarningModal = function() {
+    document.getElementById('warning-modal').classList.remove('show');
+};
+
+async function checkForWarnings() {
+    if (!currentUser) return;
+    try {
+        const snap = await get(dbRef(db, `warnings/${currentUser.uid}`));
+        if (snap.exists()) {
+            const warning = snap.val();
+            document.getElementById('warning-message').textContent = warning.message;
+            document.getElementById('warning-modal').classList.add('show');
+            await set(dbRef(db, `warnings/${currentUser.uid}`), null);
+        }
+    } catch (e) {
+        console.warn('Warning check failed:', e.message);
+    }
+}
+ 
+/* ─── マーケット初期化 ─── */
+function initMarket() {
+    allStocks = [...FAMOUS_STOCKS];
+ 
+    FAMOUS_STOCKS.forEach(s => {
+        stockPrices[s.id] = s.basePrice;
+        priceHistory[s.id] = Array(20).fill(0).map(() =>
+            s.basePrice + (Math.random() - 0.5) * s.basePrice * 0.03
+        );
+        priceHistory[s.id].push(s.basePrice);
+    });
+ 
+    loadAllUserCompanies();
+    checkForWarnings();
+ 
+    if (priceInterval) clearInterval(priceInterval);
+    priceInterval = setInterval(tickPrices, 3000);
+    renderMarket();
+    updateMarketTime();
+    setInterval(updateMarketTime, 1000);
+}
+ 
+/* ─── 全ユーザー会社を読み込む ─── */
+async function loadAllUserCompanies() {
+    const existingIds = new Set(allStocks.map(s => s.id));
+    let loaded = false;
+
+    try {
+        const snap = await get(dbRef(db, 'companies'));
+        if (snap.exists()) {
+            const companies = snap.val();
+            Object.values(companies).forEach(c => {
+                if (!existingIds.has(c.id)) {
+                    const isOwn = c.ownerUid === currentUser.uid;
+                    const ownerLabel = c.ownerUsername || (c.ownerEmail ? c.ownerEmail.split('@')[0] : '他のプレイヤー');
+                    allStocks.push({
+                        id: c.id,
+                        name: c.name,
+                        ticker: c.ticker,
+                        basePrice: c.initialPrice,
+                        sector: isOwn ? '自社' : ownerLabel,
+                        isUserCompany: true,
+                        ownerUid: c.ownerUid,
+                        ownerEmail: c.ownerEmail || null,
+                        ownerUsername: c.ownerUsername || null,
+                    });
+                    if (!stockPrices[c.id]) {
+                        stockPrices[c.id] = c.initialPrice;
+                        priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
+                            i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
+                        );
+                    }
+                    existingIds.add(c.id);
+                }
+            });
+            loaded = true;
+        }
+    } catch (e) {
+        console.warn('Could not load companies from public list:', e.message);
+    }
+
+    if (!loaded) {
+        try {
+            const snap = await get(dbRef(db, 'stock_users'));
+            if (snap.exists()) {
+                Object.entries(snap.val()).forEach(([uid, data]) => {
+                    if (data.company && !existingIds.has(data.company.id)) {
+                        const c = data.company;
+                        const isOwn = uid === currentUser.uid;
+                        allStocks.push({
+                            id: c.id,
+                            name: c.name,
+                            ticker: c.ticker,
+                            basePrice: c.initialPrice,
+                            sector: isOwn ? '自社' : (data.username || '他のプレイヤー'),
+                            isUserCompany: true,
+                            ownerUid: uid,
+                        });
+                        if (!stockPrices[c.id]) {
+                            stockPrices[c.id] = c.initialPrice;
+                            priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
+                                i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
+                            );
+                        }
+                        existingIds.add(c.id);
+                    }
+                });
+                loaded = true;
+            }
+        } catch (e) {
+            console.warn('Could not load companies from stock_users:', e.message);
+        }
+    }
+
+    if (userCompany && !existingIds.has(userCompany.id)) {
+        const c = userCompany;
+        allStocks.push({
+            id: c.id, name: c.name, ticker: c.ticker,
+            basePrice: c.initialPrice, sector: '自社',
+            isUserCompany: true, ownerUid: currentUser.uid,
+        });
+        stockPrices[c.id] = c.initialPrice;
+        priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
+            i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
+        );
+    }
+
+    if (userCompany) {
+        document.getElementById('company-form').style.display = 'none';
+        document.getElementById('company-status').style.display = 'block';
+        document.getElementById('company-info').innerHTML =
+            `<strong>${userCompany.name}</strong>（${userCompany.ticker}）<br>` +
+            `初期株価: ¥${userCompany.initialPrice.toLocaleString()}<br>` +
+            `現在の株価: ¥${(stockPrices[userCompany.id] || userCompany.initialPrice).toLocaleString()}`;
+    } else {
+        document.getElementById('company-form').style.display = '';
+        document.getElementById('company-status').style.display = 'none';
+    }
+
+    renderMarket();
+}
+ 
+/* ─── 株価変動ロジック ─── */
+function tickPrices() {
+    allStocks.forEach(s => {
+        const prev = stockPrices[s.id];
+        const volatility = s.isUserCompany ? 0.015 : 0.025;
+        const drift = (Math.random() - 0.498) * volatility;
+        let newPrice = prev * (1 + drift);
+        newPrice = Math.max(newPrice, 1);
+        newPrice = Math.round(newPrice);
+        stockPrices[s.id] = newPrice;
+ 
+        if (!priceHistory[s.id]) priceHistory[s.id] = [];
+        priceHistory[s.id].push(newPrice);
+        if (priceHistory[s.id].length > 21) priceHistory[s.id].shift();
+    });
+    renderMarket();
+    updatePortfolio();
+}
+ 
+/* ─── マーケットフィルター ─── */
+window.filterMarket = function(filter) {
+    marketFilter = filter;
+    document.querySelectorAll('.market-sub-tab').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.market-sub-tab[data-filter="${filter}"]`).classList.add('active');
+    renderMarket();
+};
+ 
+function updateMarketCounts() {
+    const realCount = allStocks.filter(s => !s.isUserCompany).length;
+    const userCount = allStocks.filter(s => s.isUserCompany).length;
+    document.getElementById('count-real').textContent = `(${realCount})`;
+    document.getElementById('count-user').textContent = `(${userCount})`;
+}
+ 
+/* ─── マーケット描画 ─── */
+function renderMarket() {
+    const grid = document.getElementById('stock-grid');
+    grid.innerHTML = '';
+    updateMarketCounts();
+ 
+    const filtered = marketFilter === 'real'
+        ? allStocks.filter(s => !s.isUserCompany)
+        : allStocks.filter(s => s.isUserCompany);
+ 
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#6b7280;padding:48px 0;font-size:14px;">
+            ${marketFilter === 'user' ? 'まだ作成された株式はありません。「会社設立」タブから会社を作れます。' : '株式データがありません'}
+        </div>`;
+        return;
+    }
+ 
+    filtered.forEach(s => {
+        const price = stockPrices[s.id] || s.basePrice;
+        const hist  = priceHistory[s.id] || [price];
+        const prev  = hist.length >= 2 ? hist[hist.length - 2] : price;
+        const change = price - prev;
+        const changePct = prev ? ((change / prev) * 100).toFixed(2) : '0.00';
+        const isOwn = userCompany && s.id === userCompany.id;
+ 
+        const holdQty = holdings[s.id] ? holdings[s.id].qty : 0;
+        const holdingBadge = holdQty > 0
+            ? `<span class="stock-holding-badge"><span class="holding-icon">📦</span>${holdQty}株 保有</span>`
+            : '';
+
+        const ownerLabel = s.ownerUsername || (s.ownerEmail ? s.ownerEmail.split('@')[0] : '他プレイヤー');
+ 
+        const card = document.createElement('div');
+        card.className = 'stock-card' + (isOwn ? ' user-company' : '');
+        card.innerHTML = `
+            <div class="stock-top">
+                <div>
+                    <div class="stock-name">${s.name} ${holdingBadge}</div>
+                    <div class="stock-ticker">${s.ticker} · ${s.sector || ''}</div>
+                </div>
+                ${isOwn ? '<span class="stock-badge badge-own">自社</span>' :
+                  (s.isUserCompany ? `<span class="stock-badge badge-other">${ownerLabel}の会社</span>` : '')}
+            </div>
+            <div class="stock-price-row">
+                <span class="stock-price">¥${price.toLocaleString()}</span>
+                <span class="stock-change ${change > 0 ? 'up' : change < 0 ? 'down' : 'flat'}">
+                    ${change >= 0 ? '+' : ''}${change.toLocaleString()} (${change >= 0 ? '+' : ''}${changePct}%)
+                </span>
+            </div>
+            <div class="mini-chart">${buildMiniChart(hist)}</div>
+            <div class="stock-actions">
+                <button class="buy-btn" data-id="${s.id}">買う</button>
+                <button class="sell-btn" data-id="${s.id}">売る</button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+ 
+    grid.querySelectorAll('.buy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openModal('buy', btn.dataset.id);
+        });
+    });
+    grid.querySelectorAll('.sell-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openModal('sell', btn.dataset.id);
+        });
+    });
+}
+ 
+function buildMiniChart(hist) {
+    if (hist.length < 2) return '';
+    const min = Math.min(...hist);
+    const max = Math.max(...hist);
+    const range = max - min || 1;
+    return hist.map((v, i) => {
+        const h = Math.max(3, ((v - min) / range) * 36);
+        const prev = i > 0 ? hist[i - 1] : v;
+        const cls = v > prev ? 'up' : v < prev ? 'down' : 'flat';
+        return `<div class="bar ${cls}" style="height:${h}px;"></div>`;
+    }).join('');
+}
+ 
+function updateMarketTime() {
+    const now = new Date();
+    document.getElementById('market-time').textContent =
+        `更新: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+}
+ 
+/* ─── 取引モーダル ─── */
+window.openModal = function(mode, stockId) {
+    tradeMode    = mode;
+    tradeStockId = stockId;
+    const stock  = allStocks.find(s => s.id === stockId);
+    if (!stock) return;
+    const price = stockPrices[stockId];
+ 
+    const titleEl   = document.getElementById('modal-title');
+    const confirmEl = document.getElementById('modal-confirm');
+    titleEl.textContent = mode === 'buy' ? `${stock.name} を購入` : `${stock.name} を売却`;
+    titleEl.className   = mode === 'buy' ? 'buy-title' : 'sell-title';
+    confirmEl.className = `modal-confirm ${mode}`;
+    confirmEl.textContent = mode === 'buy' ? '購入する' : '売却する';
+ 
+    document.getElementById('modal-stock-name').textContent  = `${stock.name} (${stock.ticker})`;
+    document.getElementById('modal-stock-price').textContent = `¥${price.toLocaleString()}`;
+    document.getElementById('modal-qty').value = 1;
+    updateModalTotal();
+ 
+    document.getElementById('trade-modal').classList.add('show');
+};
+ 
+window.closeModal = function() {
+    document.getElementById('trade-modal').classList.remove('show');
+    tradeMode = null;
+    tradeStockId = null;
+};
+ 
+window.setQty = function(n) {
+    document.getElementById('modal-qty').value = n;
+    updateModalTotal();
+};
+ 
+window.updateModalTotal = function() {
+    const qty   = parseInt(document.getElementById('modal-qty').value) || 0;
+    const price = stockPrices[tradeStockId] || 0;
+    document.getElementById('modal-total').textContent = `¥${(qty * price).toLocaleString()}`;
+};
+ 
+window.executeTrade = async function() {
+    const qty   = parseInt(document.getElementById('modal-qty').value);
+    const price = stockPrices[tradeStockId];
+    const total = qty * price;
+ 
+    if (!qty || qty < 1) { showToast('数量を入力してください', 'error'); return; }
+ 
+    if (tradeMode === 'buy') {
+        if (total > balance) {
+            showToast('残高が不足しています', 'error');
+            return;
+        }
+        balance -= total;
+        if (!holdings[tradeStockId]) {
+            holdings[tradeStockId] = { qty: 0, avgCost: 0 };
+        }
+        const h = holdings[tradeStockId];
+        const totalCost = h.avgCost * h.qty + total;
+        h.qty += qty;
+        h.avgCost = Math.round(totalCost / h.qty);
+        showToast(`${allStocks.find(s=>s.id===tradeStockId).name} を ${qty}株 購入しました`, 'success');
+    } else {
+        const h = holdings[tradeStockId];
+        if (!h || h.qty < qty) {
+            showToast('保有株数が不足しています', 'error');
+            return;
+        }
+        balance += total;
+        h.qty -= qty;
+        if (h.qty === 0) delete holdings[tradeStockId];
+        showToast(`${allStocks.find(s=>s.id===tradeStockId).name} を ${qty}株 売却しました`, 'success');
+    }
+ 
+    const trade = {
+        type:      tradeMode,
+        stockId:   tradeStockId,
+        stockName: allStocks.find(s=>s.id===tradeStockId)?.name || tradeStockId,
+        qty,
+        price,
+        total,
+        timestamp: Date.now(),
+    };
+ 
+    await Promise.all([saveUserData(), saveTradeToHistory(trade)]);
+    updateBalanceDisplay();
+    updatePortfolio();
+    renderHistory();
+    closeModal();
+};
+ 
+/* ─── 残高表示 ─── */
+function updateBalanceDisplay() {
+    document.getElementById('balance-display').textContent = balance.toLocaleString();
+}
+ 
+/* ─── ポートフォリオ ─── */
+function updatePortfolio() {
+    const summaryEl = document.getElementById('portfolio-summary');
+    const bodyEl    = document.getElementById('holdings-body');
+ 
+    let totalValue   = 0;
+    let totalCost    = 0;
+    let holdingCount = 0;
+ 
+    const rows = [];
+    Object.entries(holdings).forEach(([id, h]) => {
+        if (h.qty <= 0) return;
+        const stock    = allStocks.find(s => s.id === id);
+        const price    = stockPrices[id] || 0;
+        const value    = price * h.qty;
+        const cost     = h.avgCost * h.qty;
+        const pnl      = value - cost;
+        const pnlPct   = cost ? ((pnl / cost) * 100).toFixed(2) : '0.00';
+        totalValue    += value;
+        totalCost     += cost;
+        holdingCount++;
+ 
+        rows.push(`
+            <tr>
+                <td><strong>${stock ? stock.name : id}</strong><br><span style="color:#6b7280;font-size:11px;">${stock ? stock.ticker : ''}</span></td>
+                <td>${h.qty.toLocaleString()}</td>
+                <td>¥${h.avgCost.toLocaleString()}</td>
+                <td>¥${price.toLocaleString()}</td>
+                <td>¥${value.toLocaleString()}</td>
+                <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">
+                    ${pnl >= 0 ? '+' : ''}¥${pnl.toLocaleString()} (${pnl >= 0 ? '+' : ''}${pnlPct}%)
+                </td>
+            </tr>
+        `);
+    });
+ 
+    const totalPnl = totalValue - totalCost;
+    const totalAssets = balance + totalValue;
+ 
+    summaryEl.innerHTML = `
+        <div class="summary-card">
+            <div class="label">総資産</div>
+            <div class="value" style="color:#fbbf24;">¥${totalAssets.toLocaleString()}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">現金残高</div>
+            <div class="value" style="color:#60a5fa;">¥${balance.toLocaleString()}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">保有株評価額</div>
+            <div class="value" style="color:#e0e8f0;">¥${totalValue.toLocaleString()}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">含み損益</div>
+            <div class="value" style="color:${totalPnl >= 0 ? '#34d399' : '#f87171'};">
+                ${totalPnl >= 0 ? '+' : ''}¥${totalPnl.toLocaleString()}
+            </div>
+        </div>
+    `;
+ 
+    bodyEl.innerHTML = rows.length ? rows.join('') :
+        '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:32px;">まだ株を保有していません</td></tr>';
+}
+ 
+/* ─── 取引履歴 ─── */
+function renderHistory() {
+    const body = document.getElementById('history-body');
+    if (!tradeHistory.length) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:32px;">取引履歴はありません</td></tr>';
+        return;
+    }
+    const sorted = [...tradeHistory].sort((a, b) => b.timestamp - a.timestamp);
+    body.innerHTML = sorted.map(t => {
+        const d = new Date(t.timestamp);
+        const dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        return `
+            <tr>
+                <td>${dateStr}</td>
+                <td class="${t.type === 'buy' ? 'type-buy' : 'type-sell'}">${t.type === 'buy' ? '購入' : '売却'}</td>
+                <td>${t.stockName}</td>
+                <td>${t.qty.toLocaleString()}</td>
+                <td>¥${t.price.toLocaleString()}</td>
+                <td>¥${t.total.toLocaleString()}</td>
+            </tr>
+        `;
+    }).join('');
+}
+ 
+/* ─── 会社設立 ─── */
+window.createCompany = async function() {
+    const nameEl   = document.getElementById('company-name');
+    const tickerEl = document.getElementById('company-ticker');
+    const priceEl  = document.getElementById('company-price');
+ 
+    const name   = nameEl.value.trim();
+    const ticker = tickerEl.value.trim().toUpperCase();
+    const price  = parseInt(priceEl.value);
+ 
+    if (!name) { showToast('会社名を入力してください', 'error'); return; }
+    if (!ticker || ticker.length < 2 || ticker.length > 5 || !/^[A-Z]+$/.test(ticker)) {
+        showToast('ティッカーは英字2〜5文字で入力してください', 'error'); return;
+    }
+    if (!price || price < 100 || price > 1000000) {
+        showToast('株価は100〜1,000,000円の範囲で設定してください', 'error'); return;
+    }
+ 
+    const existing = allStocks.find(s => s.ticker === ticker);
+    if (existing) {
+        showToast('このティッカーシンボルは既に使用されています', 'error'); return;
+    }
+ 
+    if (userCompany) {
+        showToast('既に会社を設立しています', 'error'); return;
+    }
+ 
+    const companyId = 'USR_' + ticker;
+    userCompany = {
+        id:           companyId,
+        name:         name,
+        ticker:       ticker,
+        initialPrice: price,
+        createdAt:    Date.now(),
+    };
+ 
+    allStocks.push({
+        id:            companyId,
+        name:          name,
+        ticker:        ticker,
+        basePrice:     price,
+        sector:        '自社',
+        isUserCompany: true,
+        ownerUid:      currentUser.uid,
+        ownerUsername: currentUsername || '',
+    });
+    stockPrices[companyId] = price;
+    priceHistory[companyId] = Array(21).fill(price).map((p, i) =>
+        i < 20 ? p + (Math.random() - 0.5) * p * 0.01 : p
+    );
+ 
+    await saveUserData();
+    await publishCompany(userCompany);
+    renderMarket();
+ 
+    document.getElementById('company-form').style.display = 'none';
+    document.getElementById('company-status').style.display = 'block';
+    document.getElementById('company-info').innerHTML =
+        `<strong>${name}</strong>（${ticker}）<br>` +
+        `初期株価: ¥${price.toLocaleString()}<br>` +
+        `現在の株価: ¥${price.toLocaleString()}`;
+ 
+    showToast(`🏢 ${name} を設立しました！他のプレイヤーも売買できます`, 'success');
+};
+ 
+/* ─── タブ切替 ─── */
+window.switchTab = function(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+ 
+    if (tab === 'portfolio') updatePortfolio();
+    if (tab === 'history')   renderHistory();
+    if (tab === 'admin')     loadAllPlayers();
+};
+ 
+/* ─── ログインボーナス ─── */
+function getTodayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+ 
+async function checkLoginBonus() {
+    const today = getTodayStr();
+    if (lastBonusDate === today) return;
+ 
+    lastBonusDate = today;
+    balance += 10000;
+    updateBalanceDisplay();
+    await saveUserData();
+ 
+    document.getElementById('bonus-modal').classList.add('show');
+}
+ 
+window.closeBonusModal = function() {
+    document.getElementById('bonus-modal').classList.remove('show');
+};
+ 
+/* ─── トースト ─── */
+function showToast(msg, type) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className   = `toast ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

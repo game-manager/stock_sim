@@ -240,25 +240,10 @@
         .stock-holding-badge .holding-icon { font-size: 10px; }
  
         .stock-actions {
-            display: flex; flex-direction: column; gap: 8px; margin-top: 12px;
-            padding: 12px; background: #0f172a; border: 1px solid #1e293b;
-            border-radius: 8px;
-        }
-        .trade-input-group {
-            display: flex; gap: 6px; align-items: center; width: 100%;
-        }
-        .trade-input-group input {
-            flex: 1; padding: 8px 10px;
-            background: #1a2332; border: 1px solid #334155;
-            border-radius: 4px; color: #e0e8f0;
-            font-size: 12px;
-        }
-        .trade-input-group input:focus {
-            outline: none; border-color: #3b82f6;
-            box-shadow: 0 0 0 2px #3b82f633;
+            display: flex; gap: 8px;
         }
         .buy-btn, .sell-btn {
-            flex: 1; padding: 10px 8px;
+            flex: 1; padding: 8px 0;
             border: none; border-radius: 6px;
             font-size: 12px; font-weight: bold;
             cursor: pointer; transition: all 0.15s;
@@ -2233,14 +2218,8 @@ function renderMarket() {
             </div>
             <div class="mini-chart">${buildMiniChart(hist)}</div>
             <div class="stock-actions">
-                <div class="trade-input-group">
-                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="buy" placeholder="数量" min="1" value="1" style="width: 50px;">
-                    <button class="buy-btn" data-id="${s.id}" style="flex: 1;">買う</button>
-                </div>
-                <div class="trade-input-group">
-                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="sell" placeholder="数量" min="1" value="1" style="width: 50px;">
-                    <button class="sell-btn" data-id="${s.id}" style="flex: 1;">売る</button>
-                </div>
+                <button class="buy-btn" data-id="${s.id}">買う</button>
+                <button class="sell-btn" data-id="${s.id}">売る</button>
             </div>
         `;
         if (isEvent) {
@@ -2248,34 +2227,18 @@ function renderMarket() {
             card.style.borderColor = activeMultipliers[s.id] > 1.0 ? "#34d39988" : "#f8717188";
         }
         grid.appendChild(card);
-        
-        // 保存した入力値を復元
-        const buyInput = card.querySelector('input[data-type="buy"]');
-        const sellInput = card.querySelector('input[data-type="sell"]');
-        if (buyInput && savedInputs[`${s.id}-buy`]) {
-            buyInput.value = savedInputs[`${s.id}-buy`];
-        }
-        if (sellInput && savedInputs[`${s.id}-sell`]) {
-            sellInput.value = savedInputs[`${s.id}-sell`];
-        }
     });
  
     grid.querySelectorAll('.buy-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const stockId = btn.dataset.id;
-            const amountInput = btn.parentElement.querySelector('input[data-type="buy"]');
-            const amount = parseInt(amountInput.value) || 1;
-            executeTrade('buy', stockId, amount);
+            openModal('buy', btn.dataset.id);
         });
     });
     grid.querySelectorAll('.sell-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const stockId = btn.dataset.id;
-            const amountInput = btn.parentElement.querySelector('input[data-type="sell"]');
-            const amount = parseInt(amountInput.value) || 1;
-            executeTrade('sell', stockId, amount);
+            openModal('sell', btn.dataset.id);
         });
     });
 }

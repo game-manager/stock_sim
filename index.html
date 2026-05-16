@@ -394,87 +394,44 @@
         }
         .create-company-btn {
             width: 100%; padding: 14px;
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: #fff; border: none; border-radius: 8px;
             font-size: 15px; font-weight: bold;
-            letter-spacing: 2px; cursor: pointer;
-            transition: all 0.2s;
+            cursor: pointer; margin-top: 8px; transition: all 0.2s;
         }
         .create-company-btn:hover {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        }
-        .create-company-btn:disabled {
-            background: #374151; color: #6b7280; cursor: not-allowed;
-        }
-        .company-status {
-            background: #0f172a; border: 1px solid #1e293b;
-            border-radius: 10px; padding: 16px;
-        }
-        .company-status h3 {
-            color: #8b5cf6; font-size: 14px;
-            margin-bottom: 8px;
-        }
-        .company-status p {
-            color: #9ca3af; font-size: 13px;
-            line-height: 1.6;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            transform: translateY(-1px);
         }
  
-        /* ─── 取引履歴 ─── */
-        .history-table {
-            width: 100%; border-collapse: collapse;
-            background: #111827; border-radius: 10px; overflow: hidden;
-            border: 1px solid #1e293b;
-        }
-        .history-table th {
-            background: #0f172a; color: #6b7280;
-            font-size: 11px; letter-spacing: 1px;
-            padding: 12px 16px; text-align: left;
-        }
-        .history-table td {
-            padding: 10px 16px; border-top: 1px solid #1e293b;
-            font-size: 12px;
-        }
-        .history-table .type-buy { color: #34d399; font-weight: bold; }
-        .history-table .type-sell { color: #f87171; font-weight: bold; }
- 
-        /* ─── 通知トースト ─── */
+        /* トースト */
         .toast {
-            position: fixed; bottom: 24px; right: 24px;
-            background: #1e293b; border: 1px solid #334155;
-            border-radius: 10px; padding: 14px 20px;
-            color: #e0e8f0; font-size: 13px;
-            box-shadow: 0 8px 32px #000a;
-            transform: translateY(100px); opacity: 0;
-            transition: all 0.3s; z-index: 300;
-            max-width: 360px;
+            position: fixed; bottom: 24px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px; border-radius: 8px;
+            color: #fff; font-size: 14px; font-weight: bold;
+            z-index: 300; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            box-shadow: 0 4px 12px #0008;
         }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.success { border-left: 3px solid #34d399; }
-        .toast.error { border-left: 3px solid #f87171; }
-        .toast.info { border-left: 3px solid #60a5fa; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+        .toast.info { background: #2563eb; }
  
-        /* ─── マーケットサブタブ ─── */
-        .market-sub-tabs {
-            display: flex; gap: 8px; margin-bottom: 16px;
+        /* マーケットサブタブ */
+        .market-tabs {
+            display: flex; gap: 8px; margin-bottom: 20px;
         }
         .market-sub-tab {
-            padding: 8px 20px;
-            background: #1e293b; color: #6b7280;
-            border: 1px solid #334155; border-radius: 8px;
-            font-size: 13px; cursor: pointer;
-            transition: all 0.2s; letter-spacing: 0.5px;
+            padding: 6px 16px; background: #1e293b; color: #94a3b8;
+            border: 1px solid #334155; border-radius: 20px;
+            font-size: 12px; cursor: pointer; transition: all 0.2s;
         }
-        .market-sub-tab:hover { color: #94a3b8; border-color: #475569; }
+        .market-sub-tab:hover { background: #334155; color: #e0e8f0; }
         .market-sub-tab.active {
-            background: #1e3a5f; color: #60a5fa;
-            border-color: #3b82f6;
+            background: #3b82f6; color: #fff; border-color: #3b82f6;
         }
-        .market-sub-tab .tab-count {
-            font-size: 11px; color: #4b5563;
-            margin-left: 4px;
-        }
-        .market-sub-tab.active .tab-count { color: #60a5fa88; }
- 
+
         /* ─── ログインボーナス ─── */
         .bonus-modal-overlay {
             display: none; position: fixed;
@@ -486,17 +443,16 @@
         .bonus-modal {
             background: linear-gradient(135deg, #1e293b, #111827);
             border: 2px solid #fbbf24;
-            border-radius: 16px;
-            padding: 32px 40px;
+            border-radius: 20px;
+            padding: 40px;
             text-align: center;
-            box-shadow: 0 0 60px #fbbf2433;
-            max-width: 380px; width: 100%;
+            box-shadow: 0 0 40px #fbbf2433;
+            max-width: 340px; width: 100%;
         }
-        .bonus-icon { font-size: 48px; margin-bottom: 12px; }
+        .bonus-icon { font-size: 64px; margin-bottom: 16px; }
         .bonus-title {
-            color: #fbbf24; font-size: 20px;
+            color: #fff; font-size: 20px;
             font-weight: bold; margin-bottom: 8px;
-            letter-spacing: 2px;
         }
         .bonus-amount {
             color: #f59e0b; font-size: 32px;
@@ -702,260 +658,265 @@
         }
         .warning-modal-overlay.show { display: flex; }
         .warning-modal {
-            background: linear-gradient(135deg, #1e293b, #111827);
+            background: #1e293b;
             border: 2px solid #f87171;
             border-radius: 16px;
-            padding: 40px 48px;
+            padding: 32px;
             text-align: center;
-            box-shadow: 0 0 60px #f8717133;
-            max-width: 420px; width: 100%;
+            box-shadow: 0 0 40px #f8717133;
+            max-width: 400px; width: 100%;
         }
-        .warning-icon {
-            font-size: 56px; margin-bottom: 16px;
-        }
+        .warning-icon { font-size: 48px; margin-bottom: 12px; }
         .warning-title {
-            color: #f87171; font-size: 24px;
-            font-weight: bold; margin-bottom: 12px;
-            letter-spacing: 2px;
+            color: #f87171; font-size: 20px;
+            font-weight: bold; margin-bottom: 8px;
         }
         .warning-message {
-            color: #9ca3af; font-size: 14px;
-            margin-bottom: 24px; line-height: 1.6;
+            color: #e0e8f0; font-size: 14px;
+            line-height: 1.6; margin-bottom: 24px;
         }
         .warning-close-btn {
-            padding: 12px 48px;
-            background: linear-gradient(135deg, #f87171, #ef4444);
+            padding: 10px 30px;
+            background: #f87171;
             color: #fff; border: none; border-radius: 8px;
             font-size: 14px; font-weight: bold;
             cursor: pointer; transition: all 0.2s;
-            letter-spacing: 1px;
         }
-        .warning-close-btn:hover { background: linear-gradient(135deg, #fca5a5, #f87171); }
- 
-        /* ─── レスポンシブ ─── */
-        @media (max-width: 640px) {
-            .header { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
-            .content { padding: 14px; }
-            .stock-grid { grid-template-columns: 1fr; }
-            .portfolio-summary { grid-template-columns: 1fr 1fr; }
-            .tab-btn { padding: 10px 14px; font-size: 12px; }
-            .admin-grid { grid-template-columns: 1fr; }
-            .player-actions { flex-direction: column; }
-            .market-header { flex-direction: column; gap: 12px; align-items: flex-start; }
-            .market-header-right { width: 100%; }
+        .warning-close-btn:hover { background: #ef4444; }
+
+        /* ─── イベント通知 ─── */
+        .event-notification {
+            position: fixed; top: 80px; right: 24px;
+            width: 320px; background: #1e293b;
+            border-left: 4px solid #3b82f6; border-radius: 8px;
+            padding: 16px; color: #e0e8f0; z-index: 150;
+            box-shadow: 0 8px 24px #0006;
+            transform: translateX(400px); transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
+        .event-notification.show { transform: translateX(0); }
+        .event-notification.up { border-left-color: #34d399; }
+        .event-notification.down { border-left-color: #f87171; }
+        .event-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .event-icon { font-size: 20px; }
+        .event-title { font-weight: bold; font-size: 14px; color: #60a5fa; }
+        .event-notification.up .event-title { color: #34d399; }
+        .event-notification.down .event-title { color: #f87171; }
+        .event-body { font-size: 13px; line-height: 1.5; }
+        .event-impact { font-size: 11px; color: #9ca3af; margin-top: 8px; font-style: italic; }
+
     </style>
 </head>
 <body>
  
-<!-- ===== ログイン画面 ===== -->
 <div id="login-screen">
     <div class="login-box">
-        <h1>📈 株取引シミュレーター</h1>
-        <div class="subtitle">STOCK TRADING SIMULATOR</div>
+        <h1>STOCK<span>SIM</span></h1>
+        <div class="subtitle">次世代型 株取引シミュレーター</div>
+        
+        <div class="form-group" id="username-group" style="display:none;">
+            <label>ユーザー名</label>
+            <input type="text" id="auth-username" placeholder="名前を入力してください">
+        </div>
         <div class="form-group">
             <label>メールアドレス</label>
             <input type="email" id="auth-email" placeholder="example@mail.com">
         </div>
         <div class="form-group">
             <label>パスワード</label>
-            <input type="password" id="auth-password" placeholder="6文字以上">
+            <input type="password" id="auth-password" placeholder="••••••••">
         </div>
-        <!-- 新規登録時のみ表示されるユーザー名フィールド -->
-        <div class="form-group" id="username-group" style="display:none;">
-            <label>ユーザー名（表示名）</label>
-            <input type="text" id="auth-username" placeholder="例: トレーダー太郎" maxlength="20">
-        </div>
+        
+        <div id="auth-error"></div>
         <button class="auth-btn" id="auth-btn" onclick="handleAuth()">ログイン</button>
+        
         <div class="auth-toggle">
             <span id="auth-toggle-text">アカウントをお持ちでない方は</span>
             <a id="auth-toggle-link" onclick="toggleAuthMode()">新規登録</a>
         </div>
-        <div id="auth-error"></div>
     </div>
 </div>
  
-<!-- ===== メイン画面 ===== -->
 <div id="main-screen">
-    <!-- ヘッダー -->
     <div class="header">
         <div class="header-left">
-            <div class="header-logo">📈 Stock<span>Sim</span></div>
-            <div class="header-balance">
-                <span id="balance-display">10,000,000</span>
-                <span class="yen">円</span>
+            <div class="header-logo">STOCK<span>SIM</span></div>
+            <div class="header-balance" id="header-balance">
+                0<span class="yen">円</span>
             </div>
         </div>
         <div class="header-right">
-            <span class="user-name-display" id="user-name-display"></span>
-            <span class="user-email" id="user-email"></span>
-            <span class="admin-badge" id="admin-badge" style="display:none;">👨‍💼 管理者</span>
+            <div id="admin-badge" class="admin-badge" style="display:none;">ADMIN</div>
+            <div class="user-name-display" id="user-name-display"></div>
+            <div class="user-email" id="user-email"></div>
             <button class="logout-btn" onclick="handleLogout()">ログアウト</button>
         </div>
     </div>
  
-    <!-- タブ -->
     <div class="tab-nav">
-        <button class="tab-btn active" data-tab="market" onclick="switchTab('market')">マーケット</button>
-        <button class="tab-btn" data-tab="portfolio" onclick="switchTab('portfolio')">ポートフォリオ</button>
-        <button class="tab-btn" data-tab="company" onclick="switchTab('company')">会社設立</button>
-        <button class="tab-btn" data-tab="history" onclick="switchTab('history')">取引履歴</button>
-        <button class="tab-btn" data-tab="admin" id="admin-tab" onclick="switchTab('admin')" style="display:none;">⚙️ 管理者</button>
+        <button class="tab-btn active" data-tab="market">マーケット</button>
+        <button class="tab-btn" data-tab="portfolio">ポートフォリオ</button>
+        <button class="tab-btn" data-tab="company">会社設立</button>
+        <button class="tab-btn" id="admin-tab" data-tab="admin" style="display:none;">管理者</button>
     </div>
  
     <div class="content">
-        <!-- マーケットタブ -->
-        <div class="tab-content active" id="tab-market">
+        <!-- マーケット -->
+        <div id="tab-market" class="tab-content active">
             <div class="market-header">
-                <h2>株式マーケット</h2>
+                <h2>株式市場</h2>
                 <div class="market-header-right">
-                    <button class="admin-btn-market" id="admin-btn-market" onclick="openAdminAuthModal()" style="display:none;">⚙️ 企業管理</button>
-                    <div class="market-time" id="market-time"></div>
+                    <button class="admin-btn-market" id="admin-btn-market" onclick="openAdminAuthModal()" style="display:none;">📊 企業管理</button>
+                    <div class="market-time" id="market-time">更新中...</div>
                 </div>
             </div>
-            <div class="market-sub-tabs" id="market-sub-tabs">
-                <button class="market-sub-tab active" data-filter="real" onclick="filterMarket('real')">
-                    実際の株式 <span class="tab-count" id="count-real"></span>
-                </button>
-                <button class="market-sub-tab" data-filter="user" onclick="filterMarket('user')">
-                    作成した株式 <span class="tab-count" id="count-user"></span>
-                </button>
+ 
+            <div class="market-tabs">
+                <div class="market-sub-tab active" data-filter="real" onclick="filterMarket('real')">
+                    主要企業 <span id="count-real"></span>
+                </div>
+                <div class="market-sub-tab" data-filter="user" onclick="filterMarket('user')">
+                    プレイヤー企業 <span id="count-user"></span>
+                </div>
             </div>
-            <div class="stock-grid" id="stock-grid"></div>
+ 
+            <div class="stock-grid" id="stock-grid">
+                <!-- JSで生成 -->
+            </div>
         </div>
  
-        <!-- ポートフォリオタブ -->
-        <div class="tab-content" id="tab-portfolio">
-            <h2 style="margin-bottom:16px; color:#e0e8f0;">ポートフォリオ</h2>
-            <div class="portfolio-summary" id="portfolio-summary"></div>
+        <!-- ポートフォリオ -->
+        <div id="tab-portfolio" class="tab-content">
+            <div class="portfolio-summary">
+                <div class="summary-card">
+                    <div class="label">総資産</div>
+                    <div class="value" id="p-total-assets">¥0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">買付余力</div>
+                    <div class="value" id="p-cash">¥0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">評価損益</div>
+                    <div class="value" id="p-total-pnl">¥0</div>
+                </div>
+            </div>
+ 
+            <h3 style="margin-bottom:16px; font-size:16px; color:#94a3b8;">保有銘柄</h3>
             <table class="holdings-table">
                 <thead>
                     <tr>
                         <th>銘柄</th>
-                        <th>保有数</th>
-                        <th>取得単価</th>
+                        <th>数量</th>
+                        <th>平均取得単価</th>
                         <th>現在値</th>
                         <th>評価額</th>
                         <th>損益</th>
                     </tr>
                 </thead>
-                <tbody id="holdings-body"></tbody>
+                <tbody id="holdings-body">
+                    <!-- JSで生成 -->
+                </tbody>
             </table>
         </div>
  
-        <!-- 会社設立タブ -->
-        <div class="tab-content" id="tab-company">
+        <!-- 会社設立 -->
+        <div id="tab-company" class="tab-content">
             <div class="company-section">
-                <h2>🏢 自分の会社を設立する</h2>
-                <p class="desc">会社名と初期株価を設定して、あなただけの会社を上場させましょう。自社株として購入することもできます。</p>
-                <div class="company-form" id="company-form">
-                    <div class="form-group">
-                        <label>会社名</label>
-                        <input type="text" id="company-name" placeholder="例: テックイノベーション株式会社" maxlength="30">
-                        <div class="hint">30文字以内で入力してください</div>
+                <div id="company-form">
+                    <h2>自社を設立する</h2>
+                    <div class="desc">自分だけの会社を設立し、株式市場に上場させましょう。設立には1,000,000円が必要です。</div>
+                    
+                    <div class="company-form">
+                        <div class="form-group">
+                            <label>会社名</label>
+                            <input type="text" id="company-name" placeholder="例: マナス・テクノロジー">
+                            <div class="hint">最大20文字</div>
+                        </div>
+                        <div class="form-group">
+                            <label>ティッカーシンボル</label>
+                            <input type="text" id="company-ticker" placeholder="例: MANUS" maxlength="5" style="text-transform:uppercase;">
+                            <div class="hint">英大文字 2〜5文字</div>
+                        </div>
+                        <div class="form-group">
+                            <label>初期株価（円）</label>
+                            <input type="number" id="company-price" value="1000" min="100" max="100000">
+                            <div class="hint">100円〜100,000円の間</div>
+                        </div>
+                        <button class="create-company-btn" onclick="createCompany()">会社を設立・上場させる</button>
                     </div>
-                    <div class="form-group">
-                        <label>ティッカーシンボル（英字3〜5文字）</label>
-                        <input type="text" id="company-ticker" placeholder="例: TECH" maxlength="5" style="text-transform:uppercase;">
-                        <div class="hint">マーケットで表示される略称です</div>
-                    </div>
-                    <div class="form-group">
-                        <label>初期株価（円）</label>
-                        <input type="number" id="company-price" placeholder="例: 5000" min="100" max="1000000">
-                        <div class="hint">100円〜1,000,000円の範囲で設定</div>
-                    </div>
-                    <button class="create-company-btn" id="create-company-btn" onclick="createCompany()">
-                        会社を設立する
-                    </button>
                 </div>
-                <div class="company-status" id="company-status" style="display:none;">
-                    <h3>あなたの会社</h3>
-                    <p id="company-info"></p>
+ 
+                <div id="company-status" style="display:none;">
+                    <h2>自社の状況</h2>
+                    <div class="company-form" style="background: #1e3a5f22; border-color: #3b82f644;">
+                        <div id="company-info" style="line-height:1.8;"></div>
+                        <div style="margin-top:16px; font-size:12px; color:#6b7280;">
+                            ※ 自社の株価は業績（ランダム）や市場環境によって変動します。
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
- 
-        <!-- 取引履歴タブ -->
-        <div class="tab-content" id="tab-history">
-            <h2 style="margin-bottom:16px; color:#e0e8f0;">取引履歴</h2>
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>日時</th>
-                        <th>種別</th>
-                        <th>銘柄</th>
-                        <th>数量</th>
-                        <th>単価</th>
-                        <th>合計</th>
-                    </tr>
-                </thead>
-                <tbody id="history-body"></tbody>
-            </table>
-        </div>
 
-        <!-- 管理者タブ -->
-        <div class="tab-content" id="tab-admin">
+        <!-- 管理者 -->
+        <div id="tab-admin" class="tab-content">
             <div class="admin-section">
-                <h2>⚙️ 管理者パネル</h2>
+                <h2>管理者パネル</h2>
                 
                 <div class="admin-grid">
-                    <!-- プレイヤー追加 -->
                     <div class="admin-card">
-                        <h3>➕ プレイヤーを追加</h3>
-                        <div class="admin-form-group">
-                            <label>メールアドレス</label>
-                            <input type="email" id="new-player-email" placeholder="player@example.com">
-                        </div>
-                        <div class="admin-form-group">
-                            <label>初期残高（円）</label>
-                            <input type="number" id="new-player-balance" placeholder="10000000" value="10000000">
-                        </div>
-                        <button class="admin-btn" onclick="addPlayer()">プレイヤーを追加</button>
-                    </div>
-
-                    <!-- 所持金管理 -->
-                    <div class="admin-card">
-                        <h3>💰 所持金を調整</h3>
+                        <h3>プレイヤー検索・操作</h3>
                         <div class="admin-form-group">
                             <label>プレイヤーUID</label>
-                            <input type="text" id="adjust-player-uid" placeholder="ユーザーID">
+                            <input type="text" id="adjust-player-uid" placeholder="UIDを入力">
                         </div>
                         <div class="admin-form-group">
-                            <label>増減額（円）</label>
-                            <input type="number" id="adjust-amount" placeholder="例: 100000 または -50000">
+                            <label>残高増減額（円）</label>
+                            <input type="number" id="adjust-amount" placeholder="例: 1000000">
                         </div>
-                        <button class="admin-btn" onclick="adjustPlayerBalance()">残高を調整</button>
+                        <button class="admin-btn" onclick="adjustPlayerBalance()">残高を調整する</button>
                     </div>
 
-                    <!-- 警告表示 -->
                     <div class="admin-card">
-                        <h3>⚠️ プレイヤーに警告を表示</h3>
+                        <h3>警告送信</h3>
                         <div class="admin-form-group">
-                            <label>プレイヤーUID</label>
-                            <input type="text" id="warn-player-uid" placeholder="ユーザーID">
+                            <label>対象プレイヤーUID</label>
+                            <input type="text" id="warn-player-uid" placeholder="UIDを入力">
                         </div>
                         <div class="admin-form-group">
                             <label>警告メッセージ</label>
-                            <input type="text" id="warn-message" placeholder="迷惑行為が検出されました">
+                            <input type="text" id="warn-message" placeholder="警告理由を入力">
                         </div>
-                        <button class="admin-btn warning" onclick="showPlayerWarning()">警告を表示</button>
+                        <button class="admin-btn warning" onclick="showPlayerWarning()">警告を送信する</button>
+                    </div>
+
+                    <div class="admin-card">
+                        <h3>新規プレイヤー作成</h3>
+                        <div class="admin-form-group">
+                            <label>メールアドレス</label>
+                            <input type="email" id="new-player-email" placeholder="example@mail.com">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>初期残高</label>
+                            <input type="number" id="new-player-balance" value="10000000">
+                        </div>
+                        <button class="admin-btn" onclick="addPlayer()">プレイヤーを作成</button>
                     </div>
                 </div>
 
-                <!-- プレイヤーリスト -->
-                <h3 style="color: #e0e8f0; margin-bottom: 16px; margin-top: 30px;">👥 登録プレイヤー一覧</h3>
+                <h3 style="color:#e0e8f0; font-size:16px; margin-bottom:12px;">プレイヤー一覧</h3>
                 <table class="players-table">
                     <thead>
                         <tr>
                             <th>ユーザー名</th>
                             <th>メールアドレス</th>
                             <th>UID</th>
-                            <th>現在の残高</th>
+                            <th>残高</th>
                             <th>操作</th>
                         </tr>
                     </thead>
                     <tbody id="players-body">
-                        <tr><td colspan="5" style="text-align:center;color:#6b7280;padding:32px;">プレイヤーデータを読み込み中...</td></tr>
+                        <!-- JSで生成 -->
                     </tbody>
                 </table>
             </div>
@@ -963,40 +924,56 @@
     </div>
 </div>
  
-<!-- ===== 取引モーダル ===== -->
+<!-- 取引モーダル -->
 <div class="modal-overlay" id="trade-modal">
     <div class="modal">
-        <h3 id="modal-title"></h3>
+        <h3 id="modal-title">銘柄を購入</h3>
+        
         <div class="modal-info">
             <div>
                 <div class="label">銘柄</div>
-                <div class="value" id="modal-stock-name"></div>
+                <div class="value" id="modal-stock-name">-</div>
             </div>
-            <div style="text-align:right;">
-                <div class="label">現在の株価</div>
-                <div class="value" id="modal-stock-price"></div>
+            <div>
+                <div class="label">現在値</div>
+                <div class="value" id="modal-stock-price">-</div>
             </div>
         </div>
+ 
         <div class="qty-row">
-            <label>数量:</label>
-            <input type="number" class="qty-input" id="modal-qty" min="1" value="1" oninput="updateModalTotal()">
-            <span style="color:#6b7280;font-size:13px;">株</span>
+            <label>数量 (株)</label>
+            <input type="number" id="modal-qty" class="qty-input" value="1" min="1" oninput="updateModalTotal()">
         </div>
+ 
         <div class="qty-presets">
-            <button class="qty-preset" onclick="setQty(1)">1株</button>
-            <button class="qty-preset" onclick="setQty(5)">5株</button>
-            <button class="qty-preset" onclick="setQty(10)">10株</button>
-            <button class="qty-preset" onclick="setQty(50)">50株</button>
-            <button class="qty-preset" onclick="setQty(100)">100株</button>
+            <div class="qty-preset" onclick="setQty(10)">10</div>
+            <div class="qty-preset" onclick="setQty(100)">100</div>
+            <div class="qty-preset" onclick="setQty(1000)">1000</div>
+            <div class="qty-preset" onclick="setQty(10000)">10000</div>
         </div>
+ 
         <div class="modal-total">
-            合計金額
-            <span class="total-val" id="modal-total">¥0</span>
+            概算合計 <span class="total-val" id="modal-total">¥0</span>
         </div>
+ 
         <div class="modal-btns">
             <button class="modal-cancel" onclick="closeModal()">キャンセル</button>
-            <button class="modal-confirm" id="modal-confirm" onclick="executeTrade()">実行</button>
+            <button class="modal-confirm" id="modal-confirm" onclick="executeTrade()">確定</button>
         </div>
+    </div>
+</div>
+
+<!-- イベント通知 -->
+<div class="event-notification" id="event-notification">
+    <div class="event-header">
+        <span class="event-icon" id="event-icon">📢</span>
+        <span class="event-title" id="event-title">市場ニュース</span>
+    </div>
+    <div class="event-body" id="event-body">
+        ニュースの内容がここに表示されます。
+    </div>
+    <div class="event-impact" id="event-impact">
+        株価への影響が表示されます。
     </div>
 </div>
 
@@ -1150,12 +1127,14 @@ let userCompany    = null;
 let tradeMode      = null;
 let tradeStockId   = null;
 let priceInterval  = null;
+let eventInterval  = null;
 let allStocks      = [...FAMOUS_STOCKS];
 let marketFilter   = 'real';
 let lastBonusDate  = null;
 let allPlayers     = {};
 let currentUsername = '';
 let allCompanies   = [];
+let activeMultipliers = {}; // イベントによる倍率 { stockId: multiplier }
  
 /* ─── Firebase認証 ─── */
 window.toggleAuthMode = function() {
@@ -1219,6 +1198,7 @@ function resetUserState() {
     userCompany   = null;
     lastBonusDate = null;
     currentUsername = '';
+    activeMultipliers = {};
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -1247,6 +1227,7 @@ onAuthStateChanged(auth, async (user) => {
         }
         checkLoginBonus();
         initMarket();
+        startEventSystem();
     } else {
         currentUser = null;
         isAdmin = false;
@@ -1258,6 +1239,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('admin-btn-market').style.display = 'none';
         document.getElementById('user-name-display').textContent = '';
         if (priceInterval) { clearInterval(priceInterval); priceInterval = null; }
+        if (eventInterval) { clearTimeout(eventInterval); eventInterval = null; }
     }
 });
  
@@ -1297,170 +1279,155 @@ function loadFromLocalStorage() {
 /* ─── ユーザーデータ読み込み ─── */
 async function loadUserData() {
     const uid = currentUser.uid;
-    resetUserState();
     const snap = await get(dbRef(db, `stock_users/${uid}`));
     if (snap.exists()) {
         const data = snap.val();
-        balance      = data.balance ?? 10000000;
-        holdings     = data.holdings ?? {};
+        balance = data.balance ?? 10000000;
+        holdings = data.holdings ?? {};
         tradeHistory = data.history ? Object.values(data.history) : [];
         lastBonusDate = data.lastBonusDate || null;
         currentUsername = data.username || '';
-        if (data.company) {
-            userCompany = data.company;
-            await publishCompany(userCompany);
-        }
-    } else {
-        loadFromLocalStorage();
+        if (data.company) userCompany = data.company;
     }
-    saveToLocalStorage();
     updateBalanceDisplay();
     updateUsernameDisplay();
 }
- 
-function updateUsernameDisplay() {
-    const nameEl = document.getElementById('user-name-display');
-    if (currentUsername) {
-        nameEl.textContent = `👤 ${currentUsername}`;
-    } else {
-        nameEl.textContent = '';
-    }
-}
 
 async function saveUserData() {
+    if (!currentUser) return;
     const uid = currentUser.uid;
-    saveToLocalStorage();
     try {
-        await set(dbRef(db, `stock_users/${uid}`), {
-            username: currentUsername || '',
-            email: currentUser.email,
-            balance,
-            holdings,
-            company: userCompany || null,
-            lastBonusDate: lastBonusDate || null,
+        await update(dbRef(db, `stock_users/${uid}`), {
+            balance, holdings,
+            lastBonusDate,
+            username: currentUsername
         });
+        saveToLocalStorage();
     } catch (e) {
-        console.warn('Firebase save failed, data saved to localStorage:', e.message);
+        console.warn('Firebase save failed:', e.message);
+        saveToLocalStorage();
     }
 }
 
-async function publishCompany(company) {
-    try {
-        await set(dbRef(db, `companies/${company.id}`), {
-            id:           company.id,
-            name:         company.name,
-            ticker:       company.ticker,
-            initialPrice: company.initialPrice,
-            createdAt:    company.createdAt,
-            ownerUid:     currentUser.uid,
-            ownerEmail:   currentUser.email,
-            ownerUsername: currentUsername || '',
-        });
-    } catch (e) {
-        console.warn('Failed to publish company to public list:', e.message);
-    }
+function updateBalanceDisplay() {
+    document.getElementById('header-balance').innerHTML =
+        `${balance.toLocaleString()}<span class="yen">円</span>`;
 }
+
+function updateUsernameDisplay() {
+    document.getElementById('user-name-display').textContent = currentUsername || '名無しプレイヤー';
+}
+
+/* ─── タブ切り替え ─── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        
+        if (tab === 'portfolio') updatePortfolio();
+        if (tab === 'admin') loadAllPlayers();
+    });
+});
+
+/* ─── 会社設立 ─── */
+window.createCompany = async function() {
+    const name   = document.getElementById('company-name').value.trim();
+    const ticker = document.getElementById('company-ticker').value.trim().toUpperCase();
+    const price  = parseInt(document.getElementById('company-price').value);
  
-async function saveTradeToHistory(trade) {
-    const uid = currentUser.uid;
-    tradeHistory.push(trade);
-    saveToLocalStorage();
+    if (!name || name.length > 20) { showToast('有効な会社名を入力してください', 'error'); return; }
+    if (!/^[A-Z]{2,5}$/.test(ticker)) { showToast('ティッカーは英大文字2〜5文字です', 'error'); return; }
+    if (isNaN(price) || price < 100 || price > 100000) { showToast('価格は100〜100,000円の間です', 'error'); return; }
+    if (balance < 1000000) { showToast('設立費用1,000,000円が不足しています', 'error'); return; }
+ 
+    if (userCompany) { showToast('既に会社を所有しています', 'error'); return; }
+ 
+    const companyId = 'user_' + Date.now();
+    const newCompany = {
+        id: companyId,
+        name: name,
+        ticker: ticker,
+        initialPrice: price,
+        ownerUid: currentUser.uid,
+        ownerEmail: currentUser.email,
+        ownerUsername: currentUsername,
+        createdAt: Date.now()
+    };
+ 
     try {
-        await push(dbRef(db, `stock_users/${uid}/history`), trade);
+        balance -= 1000000;
+        userCompany = newCompany;
+        
+        // Firebaseに保存
+        await set(dbRef(db, `companies/${companyId}`), newCompany);
+        await update(dbRef(db, `stock_users/${currentUser.uid}`), {
+            company: newCompany,
+            balance: balance
+        });
+ 
+        showToast('🎉 会社を設立し、上場しました！', 'success');
+        initMarket();
+        updateBalanceDisplay();
     } catch (e) {
-        console.warn('Firebase history save failed:', e.message);
+        showToast('設立に失敗しました: ' + e.message, 'error');
     }
-}
+};
 
-/* ─── 管理者パスワード認証 ─── */
+/* ─── 管理者企業管理 ─── */
 window.openAdminAuthModal = function() {
-    document.getElementById('admin-auth-modal').classList.add('show');
     document.getElementById('admin-auth-password').value = '';
     document.getElementById('admin-auth-error').textContent = '';
+    document.getElementById('admin-auth-modal').classList.add('show');
 };
 
 window.closeAdminAuthModal = function() {
     document.getElementById('admin-auth-modal').classList.remove('show');
-    document.getElementById('admin-auth-password').value = '';
-    document.getElementById('admin-auth-error').textContent = '';
 };
 
-window.confirmAdminAuth = async function() {
-    const password = document.getElementById('admin-auth-password').value;
-    const errEl = document.getElementById('admin-auth-error');
-    errEl.textContent = '';
-
-    if (!password) {
-        errEl.textContent = 'パスワードを入力してください';
-        return;
+window.confirmAdminAuth = function() {
+    const pass = document.getElementById('admin-auth-password').value;
+    if (pass === ADMIN_PASSWORD) {
+        closeAdminAuthModal();
+        openCompanyManagementModal();
+    } else {
+        document.getElementById('admin-auth-error').textContent = 'パスワードが違います';
     }
+};
 
-    if (password !== ADMIN_PASSWORD) {
-        errEl.textContent = 'パスワードが正しくありません';
-        return;
-    }
-
-    closeAdminAuthModal();
-    await loadAllCompanies();
+window.openCompanyManagementModal = async function() {
     document.getElementById('company-management-modal').classList.add('show');
+    renderCompaniesTable();
 };
 
 window.closeCompanyManagementModal = function() {
     document.getElementById('company-management-modal').classList.remove('show');
 };
 
-/* ─── 企業管理機能 ─── */
-async function loadAllCompanies() {
-    try {
-        const snap = await get(dbRef(db, 'companies'));
-        allCompanies = [];
-        if (snap.exists()) {
-            Object.entries(snap.val()).forEach(([id, data]) => {
-                allCompanies.push(data);
-            });
-        }
-        // FAMOUS_STOCKSも追加
-        FAMOUS_STOCKS.forEach(s => {
-            if (!allCompanies.find(c => c.id === s.id)) {
-                allCompanies.push({
-                    id: s.id,
-                    name: s.name,
-                    ticker: s.ticker,
-                    initialPrice: s.basePrice,
-                    type: 'famous'
-                });
-            }
-        });
-        renderCompaniesTable();
-    } catch (e) {
-        console.warn('Failed to load companies:', e.message);
-    }
-}
-
 function renderCompaniesTable() {
     const body = document.getElementById('companies-body');
     const rows = [];
     
-    allCompanies.forEach(company => {
-        const isFamous = FAMOUS_STOCKS.find(s => s.id === company.id);
-        const type = isFamous ? '実在企業' : 'ユーザー企業';
-        const canDelete = !isFamous;
-        
+    allStocks.forEach(s => {
+        const typeLabel = s.isUserCompany ? (s.ownerUid === currentUser.uid ? '自社' : 'プレイヤー') : 'システム';
         rows.push(`
             <tr>
-                <td style="color:#e0e8f0;font-weight:bold;">${company.name}</td>
-                <td>${company.ticker}</td>
-                <td>¥${company.initialPrice.toLocaleString()}</td>
-                <td>${type}</td>
+                <td style="color:#e0e8f0; font-weight:bold;">${s.name}</td>
+                <td style="font-family:monospace;">${s.ticker}</td>
+                <td>¥${s.basePrice.toLocaleString()}</td>
+                <td><span class="stock-badge ${s.isUserCompany ? 'badge-other' : 'badge-own'}" style="background:#1e293b; color:#94a3b8; border:1px solid #334155;">${typeLabel}</span></td>
                 <td>
-                    ${canDelete ? `<div class="company-actions"><button class="company-action-btn delete" onclick="deleteCompanyFromAdmin('${company.id}', '${company.name}')">削除</button></div>` : '<span style="color:#6b7280;">-</span>'}
+                    <div class="company-actions">
+                        <button class="company-action-btn delete" onclick="deleteCompanyFromAdmin('${s.id}', '${s.name}')">削除</button>
+                    </div>
                 </td>
             </tr>
         `);
     });
     
-    body.innerHTML = rows.length ? rows.join('') :
-        '<tr><td colspan="5" style="text-align:center;color:#6b7280;padding:32px;">企業がありません</td></tr>';
+    body.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5" style="text-align:center;color:#6b7280;padding:32px;">企業がありません</td></tr>';
 }
 
 window.addCompanyFromAdmin = async function() {
@@ -1468,53 +1435,30 @@ window.addCompanyFromAdmin = async function() {
     const ticker = document.getElementById('new-company-ticker').value.trim().toUpperCase();
     const price = parseInt(document.getElementById('new-company-price').value);
 
-    if (!name) { showToast('企業名を入力してください', 'error'); return; }
-    if (!ticker || ticker.length < 2 || ticker.length > 5 || !/^[A-Z]+$/.test(ticker)) {
-        showToast('ティッカーは英字2〜5文字で入力してください', 'error'); return;
-    }
-    if (!price || price < 100) {
-        showToast('株価は100円以上で設定してください', 'error'); return;
+    if (!name || !ticker || isNaN(price)) {
+        showToast('すべての項目を入力してください', 'error');
+        return;
     }
 
-    const existing = allCompanies.find(c => c.ticker === ticker);
-    if (existing) {
-        showToast('このティッカーシンボルは既に使用されています', 'error'); return;
-    }
-
+    const companyId = 'admin_' + Date.now();
     try {
-        const companyId = 'ADM_' + ticker + '_' + Date.now();
-        const company = {
+        await set(dbRef(db, `companies/${companyId}`), {
             id: companyId,
             name: name,
             ticker: ticker,
             initialPrice: price,
-            createdAt: Date.now(),
-            createdByAdmin: true,
-        };
-
-        await set(dbRef(db, `companies/${companyId}`), company);
-        
-        allCompanies.push(company);
-        stockPrices[companyId] = price;
-        priceHistory[companyId] = Array(21).fill(price).map((p, i) =>
-            i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
-        );
+            ownerUid: 'admin',
+            ownerUsername: '管理者',
+            createdAt: Date.now()
+        });
 
         showToast(`✅ 企業 ${name} を追加しました`, 'success');
         document.getElementById('new-company-name').value = '';
         document.getElementById('new-company-ticker').value = '';
         document.getElementById('new-company-price').value = '';
         
+        initMarket();
         renderCompaniesTable();
-        allStocks.push({
-            id: companyId,
-            name: name,
-            ticker: ticker,
-            basePrice: price,
-            sector: '管理者作成',
-            isUserCompany: true,
-        });
-        renderMarket();
     } catch (e) {
         showToast('企業追加に失敗しました: ' + e.message, 'error');
     }
@@ -1525,15 +1469,9 @@ window.deleteCompanyFromAdmin = async function(companyId, companyName) {
 
     try {
         await set(dbRef(db, `companies/${companyId}`), null);
-        
-        allCompanies = allCompanies.filter(c => c.id !== companyId);
-        allStocks = allStocks.filter(s => s.id !== companyId);
-        delete stockPrices[companyId];
-        delete priceHistory[companyId];
-
         showToast(`✅ 企業「${companyName}」を削除しました`, 'success');
+        initMarket();
         renderCompaniesTable();
-        renderMarket();
     } catch (e) {
         showToast('企業削除に失敗しました: ' + e.message, 'error');
     }
@@ -1702,21 +1640,22 @@ async function checkForWarnings() {
 }
  
 /* ─── マーケット初期化 ─── */
-function initMarket() {
+async function initMarket() {
     allStocks = [...FAMOUS_STOCKS];
  
     FAMOUS_STOCKS.forEach(s => {
-        stockPrices[s.id] = s.basePrice;
-        priceHistory[s.id] = Array(20).fill(0).map(() =>
-            s.basePrice + (Math.random() - 0.5) * s.basePrice * 0.02
-        );
+        if (!stockPrices[s.id]) {
+            stockPrices[s.id] = s.basePrice;
+            priceHistory[s.id] = Array(20).fill(0).map(() =>
+                s.basePrice + (Math.random() - 0.5) * s.basePrice * 0.02
+            );
+        }
     });
  
-    loadPublicCompanies();
+    await loadPublicCompanies();
 }
 
 async function loadPublicCompanies() {
-    let loaded = false;
     const existingIds = new Set(FAMOUS_STOCKS.map(s => s.id));
     
     try {
@@ -1746,56 +1685,9 @@ async function loadPublicCompanies() {
                     existingIds.add(c.id);
                 }
             });
-            loaded = true;
         }
     } catch (e) {
-        console.warn('Could not load companies from public list:', e.message);
-    }
-
-    if (!loaded) {
-        try {
-            const snap = await get(dbRef(db, 'stock_users'));
-            if (snap.exists()) {
-                Object.entries(snap.val()).forEach(([uid, data]) => {
-                    if (data.company && !existingIds.has(data.company.id)) {
-                        const c = data.company;
-                        const isOwn = uid === currentUser.uid;
-                        allStocks.push({
-                            id: c.id,
-                            name: c.name,
-                            ticker: c.ticker,
-                            basePrice: c.initialPrice,
-                            sector: isOwn ? '自社' : (data.username || '他のプレイヤー'),
-                            isUserCompany: true,
-                            ownerUid: uid,
-                        });
-                        if (!stockPrices[c.id]) {
-                            stockPrices[c.id] = c.initialPrice;
-                            priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
-                                i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
-                            );
-                        }
-                        existingIds.add(c.id);
-                    }
-                });
-                loaded = true;
-            }
-        } catch (e) {
-            console.warn('Could not load companies from stock_users:', e.message);
-        }
-    }
-
-    if (userCompany && !existingIds.has(userCompany.id)) {
-        const c = userCompany;
-        allStocks.push({
-            id: c.id, name: c.name, ticker: c.ticker,
-            basePrice: c.initialPrice, sector: '自社',
-            isUserCompany: true, ownerUid: currentUser.uid,
-        });
-        stockPrices[c.id] = c.initialPrice;
-        priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
-            i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
-        );
+        console.warn('Could not load companies:', e.message);
     }
 
     if (userCompany) {
@@ -1817,9 +1709,16 @@ async function loadPublicCompanies() {
 function tickPrices() {
     allStocks.forEach(s => {
         const prev = stockPrices[s.id];
-        const volatility = s.isUserCompany ? 0.015 : 0.025;
-        const drift = (Math.random() - 0.498) * volatility;
-        let newPrice = prev * (1 + drift);
+        let volatility = s.isUserCompany ? 0.015 : 0.025;
+        
+        // イベントによる倍率適用
+        const multiplier = activeMultipliers[s.id] || 1.0;
+        
+        // 基本的なドリフト + イベントの影響
+        const baseDrift = (Math.random() - 0.498) * volatility;
+        const eventImpact = (multiplier - 1.0) * 0.1; // 倍率に応じてドリフトを調整
+        
+        let newPrice = prev * (1 + baseDrift + eventImpact);
         newPrice = Math.max(newPrice, 1);
         newPrice = Math.round(newPrice);
         stockPrices[s.id] = newPrice;
@@ -1830,6 +1729,81 @@ function tickPrices() {
     });
     renderMarket();
     updatePortfolio();
+}
+
+/* ─── イベントシステム ─── */
+const EVENT_TEMPLATES = [
+    { title: "新作発表", body: "が新作の[PRODUCT]を発売しました。市場の期待が高まっています！", impact: 1.5, type: "up" },
+    { title: "決算報告", body: "の四半期決算が予想を大幅に上回りました。", impact: 1.3, type: "up" },
+    { title: "業務提携", body: "が大手企業との提携を発表しました。相乗効果が期待されます。", impact: 1.2, type: "up" },
+    { title: "不祥事発覚", body: "で大規模な不祥事が発覚しました。信頼が失墜しています。", impact: 0.6, type: "down" },
+    { title: "リコール発表", body: "が主力製品のリコールを発表しました。多額の損失が見込まれます。", impact: 0.7, type: "down" },
+    { title: "サイバー攻撃", body: "が大規模なサイバー攻撃を受け、サービスが停止しています。", impact: 0.8, type: "down" },
+    { title: "技術革新", body: "が画期的な新技術を開発しました。業界の勢力図を塗り替える可能性があります。", impact: 1.4, type: "up" }
+];
+
+const PRODUCTS = ["デバイス", "ソフトウェア", "エンジン", "プラットフォーム", "AIチップ", "サービス"];
+
+function startEventSystem() {
+    if (eventInterval) clearTimeout(eventInterval);
+    
+    const nextEventTime = 30000 + Math.random() * 30000; // 30〜60秒
+    eventInterval = setTimeout(() => {
+        triggerRandomEvent();
+        startEventSystem(); // 次のイベントをスケジュール
+    }, nextEventTime);
+}
+
+window.triggerRandomEvent = function() {
+    if (allStocks.length === 0) return;
+    
+    const targetStock = allStocks[Math.floor(Math.random() * allStocks.length)];
+    const template = EVENT_TEMPLATES[Math.floor(Math.random() * EVENT_TEMPLATES.length)];
+    
+    let body = template.body.replace("[PRODUCT]", PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)]);
+    body = `${targetStock.name} ${body}`;
+    
+    // イベントの影響を適用
+    activeMultipliers[targetStock.id] = template.impact;
+    
+    // 関連銘柄（同じセクター）への影響（半分程度の影響）
+    allStocks.forEach(s => {
+        if (s.id !== targetStock.id && s.sector === targetStock.sector) {
+            const secondaryImpact = 1.0 + (template.impact - 1.0) * 0.4;
+            activeMultipliers[s.id] = secondaryImpact;
+        }
+    });
+    
+    // 通知を表示
+    showEventNotification(template.title, body, template.type, targetStock);
+    
+    // 15秒後に影響を解消
+    setTimeout(() => {
+        delete activeMultipliers[targetStock.id];
+        allStocks.forEach(s => {
+            if (s.sector === targetStock.sector) delete activeMultipliers[s.id];
+        });
+    }, 15000);
+}
+
+function showEventNotification(title, body, type, target) {
+    const el = document.getElementById('event-notification');
+    const titleEl = document.getElementById('event-title');
+    const bodyEl = document.getElementById('event-body');
+    const impactEl = document.getElementById('event-impact');
+    const iconEl = document.getElementById('event-icon');
+    
+    el.className = `event-notification ${type} show`;
+    titleEl.textContent = title;
+    bodyEl.textContent = body;
+    iconEl.textContent = type === "up" ? "🚀" : "⚠️";
+    
+    const impactText = type === "up" ? "株価が急上昇中！" : "株価が下落しています。";
+    impactEl.textContent = `影響: ${target.name}および同セクターの銘柄の${impactText}`;
+    
+    setTimeout(() => {
+        el.classList.remove('show');
+    }, 8000);
 }
  
 /* ─── マーケットフィルター ─── */
@@ -1881,6 +1855,11 @@ function renderMarket() {
  
         const card = document.createElement('div');
         card.className = 'stock-card' + (isOwn ? ' user-company' : '');
+        
+        // イベント中かチェック
+        const isEvent = activeMultipliers[s.id] !== undefined;
+        const eventEffect = isEvent ? (activeMultipliers[s.id] > 1.0 ? ' style="box-shadow: 0 0 15px #34d39944; border-color: #34d39988;"' : ' style="box-shadow: 0 0 15px #f8717144; border-color: #f8717188;"') : '';
+
         card.innerHTML = `
             <div class="stock-top">
                 <div>
@@ -1902,6 +1881,10 @@ function renderMarket() {
                 <button class="sell-btn" data-id="${s.id}">売る</button>
             </div>
         `;
+        if (isEvent) {
+            card.style.boxShadow = activeMultipliers[s.id] > 1.0 ? "0 0 15px #34d39944" : "0 0 15px #f8717144";
+            card.style.borderColor = activeMultipliers[s.id] > 1.0 ? "#34d39988" : "#f8717188";
+        }
         grid.appendChild(card);
     });
  
@@ -1998,7 +1981,6 @@ window.executeTrade = async function() {
         const totalCost = h.avgCost * h.qty + total;
         h.qty += qty;
         h.avgCost = Math.round(totalCost / h.qty);
-        showToast(`${allStocks.find(s=>s.id===tradeStockId).name} を ${qty}株 購入しました`, 'success');
     } else {
         const h = holdings[tradeStockId];
         if (!h || h.qty < qty) {
@@ -2008,195 +1990,60 @@ window.executeTrade = async function() {
         balance += total;
         h.qty -= qty;
         if (h.qty === 0) delete holdings[tradeStockId];
-        showToast(`${allStocks.find(s=>s.id===tradeStockId).name} を ${qty}株 売却しました`, 'success');
     }
- 
-    const trade = {
-        type:      tradeMode,
-        stockId:   tradeStockId,
-        stockName: allStocks.find(s=>s.id===tradeStockId)?.name || tradeStockId,
-        qty,
-        price,
-        total,
-        timestamp: Date.now(),
-    };
- 
-    await Promise.all([saveUserData(), saveTradeToHistory(trade)]);
-    updateBalanceDisplay();
-    updatePortfolio();
-    renderHistory();
-    closeModal();
-};
- 
-/* ─── 残高表示 ─── */
-function updateBalanceDisplay() {
-    document.getElementById('balance-display').textContent = balance.toLocaleString();
-}
- 
-/* ─── ポートフォリオ ─── */
-function updatePortfolio() {
-    const summaryEl = document.getElementById('portfolio-summary');
-    const bodyEl    = document.getElementById('holdings-body');
- 
-    let totalValue   = 0;
-    let totalCost    = 0;
-    let holdingCount = 0;
- 
-    const rows = [];
-    Object.entries(holdings).forEach(([id, h]) => {
-        if (h.qty <= 0) return;
-        const stock    = allStocks.find(s => s.id === id);
-        const price    = stockPrices[id] || 0;
-        const value    = price * h.qty;
-        const cost     = h.avgCost * h.qty;
-        const pnl      = value - cost;
-        const pnlPct   = cost ? ((pnl / cost) * 100).toFixed(2) : '0.00';
-        totalValue    += value;
-        totalCost     += cost;
-        holdingCount++;
- 
-        rows.push(`
-            <tr>
-                <td><strong>${stock ? stock.name : id}</strong><br><span style="color:#6b7280;font-size:11px;">${stock ? stock.ticker : ''}</span></td>
-                <td>${h.qty.toLocaleString()}</td>
-                <td>¥${h.avgCost.toLocaleString()}</td>
-                <td>¥${price.toLocaleString()}</td>
-                <td>¥${value.toLocaleString()}</td>
-                <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">
-                    ${pnl >= 0 ? '+' : ''}¥${pnl.toLocaleString()} (${pnl >= 0 ? '+' : ''}${pnlPct}%)
-                </td>
-            </tr>
-        `);
-    });
- 
-    const totalPnl = totalValue - totalCost;
-    const totalAssets = balance + totalValue;
- 
-    summaryEl.innerHTML = `
-        <div class="summary-card">
-            <div class="label">総資産</div>
-            <div class="value" style="color:#fbbf24;">¥${totalAssets.toLocaleString()}</div>
-        </div>
-        <div class="summary-card">
-            <div class="label">現金残高</div>
-            <div class="value" style="color:#60a5fa;">¥${balance.toLocaleString()}</div>
-        </div>
-        <div class="summary-card">
-            <div class="label">保有株評価額</div>
-            <div class="value" style="color:#e0e8f0;">¥${totalValue.toLocaleString()}</div>
-        </div>
-        <div class="summary-card">
-            <div class="label">含み損益</div>
-            <div class="value" style="color:${totalPnl >= 0 ? '#34d399' : '#f87171'};">
-                ${totalPnl >= 0 ? '+' : ''}¥${totalPnl.toLocaleString()}
-            </div>
-        </div>
-    `;
- 
-    bodyEl.innerHTML = rows.length ? rows.join('') :
-        '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:32px;">まだ株を保有していません</td></tr>';
-}
- 
-/* ─── 取引履歴 ─── */
-function renderHistory() {
-    const body = document.getElementById('history-body');
-    if (!tradeHistory.length) {
-        body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:32px;">取引履歴はありません</td></tr>';
-        return;
-    }
-    const sorted = [...tradeHistory].sort((a, b) => b.timestamp - a.timestamp);
-    body.innerHTML = sorted.map(t => {
-        const d = new Date(t.timestamp);
-        const dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-        return `
-            <tr>
-                <td>${dateStr}</td>
-                <td class="${t.type === 'buy' ? 'type-buy' : 'type-sell'}">${t.type === 'buy' ? '購入' : '売却'}</td>
-                <td>${t.stockName}</td>
-                <td>${t.qty.toLocaleString()}</td>
-                <td>¥${t.price.toLocaleString()}</td>
-                <td>¥${t.total.toLocaleString()}</td>
-            </tr>
-        `;
-    }).join('');
-}
- 
-/* ─── 会社設立 ─── */
-window.createCompany = async function() {
-    const nameEl   = document.getElementById('company-name');
-    const tickerEl = document.getElementById('company-ticker');
-    const priceEl  = document.getElementById('company-price');
- 
-    const name   = nameEl.value.trim();
-    const ticker = tickerEl.value.trim().toUpperCase();
-    const price  = parseInt(priceEl.value);
- 
-    if (!name) { showToast('会社名を入力してください', 'error'); return; }
-    if (!ticker || ticker.length < 2 || ticker.length > 5 || !/^[A-Z]+$/.test(ticker)) {
-        showToast('ティッカーは英字2〜5文字で入力してください', 'error'); return;
-    }
-    if (!price || price < 100 || price > 1000000) {
-        showToast('株価は100〜1,000,000円の範囲で設定してください', 'error'); return;
-    }
- 
-    const existing = allStocks.find(s => s.ticker === ticker);
-    if (existing) {
-        showToast('このティッカーシンボルは既に使用されています', 'error'); return;
-    }
- 
-    if (userCompany) {
-        showToast('既に会社を設立しています', 'error'); return;
-    }
- 
-    const companyId = 'USR_' + ticker;
-    userCompany = {
-        id:           companyId,
-        name:         name,
-        ticker:       ticker,
-        initialPrice: price,
-        createdAt:    Date.now(),
-    };
- 
-    allStocks.push({
-        id:            companyId,
-        name:          name,
-        ticker:        ticker,
-        basePrice:     price,
-        sector:        '自社',
-        isUserCompany: true,
-        ownerUid:      currentUser.uid,
-        ownerUsername: currentUsername || '',
-    });
-    stockPrices[companyId] = price;
-    priceHistory[companyId] = Array(21).fill(price).map((p, i) =>
-        i < 20 ? p + (Math.random() - 0.5) * p * 0.01 : p
-    );
  
     await saveUserData();
-    await publishCompany(userCompany);
-    renderMarket();
- 
-    document.getElementById('company-form').style.display = 'none';
-    document.getElementById('company-status').style.display = 'block';
-    document.getElementById('company-info').innerHTML =
-        `<strong>${name}</strong>（${ticker}）<br>` +
-        `初期株価: ¥${price.toLocaleString()}<br>` +
-        `現在の株価: ¥${price.toLocaleString()}`;
- 
-    showToast(`🏢 ${name} を設立しました！他のプレイヤーも売買できます`, 'success');
+    updateBalanceDisplay();
+    closeModal();
+    showToast(tradeMode === 'buy' ? '購入しました' : '売却しました', 'success');
+    updatePortfolio();
 };
  
-/* ─── タブ切替 ─── */
-window.switchTab = function(tab) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(`tab-${tab}`).classList.add('active');
+/* ─── ポートフォリオ更新 ─── */
+function updatePortfolio() {
+    let stockValue = 0;
+    let totalPnl   = 0;
+    const body = document.getElementById('holdings-body');
+    body.innerHTML = '';
  
-    if (tab === 'portfolio') updatePortfolio();
-    if (tab === 'history')   renderHistory();
-    if (tab === 'admin')     loadAllPlayers();
-};
+    Object.entries(holdings).forEach(([id, h]) => {
+        const stock = allStocks.find(s => s.id === id);
+        if (!stock) return;
+        const currentPrice = stockPrices[id] || stock.basePrice;
+        const value = currentPrice * h.qty;
+        const pnl   = (currentPrice - h.avgCost) * h.qty;
+        const pnlPct = ((currentPrice / h.avgCost - 1) * 100).toFixed(2);
+ 
+        stockValue += value;
+        totalPnl   += pnl;
+ 
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div style="font-weight:bold;color:#e0e8f0;">${stock.name}</div>
+                <div style="font-size:11px;color:#6b7280;">${stock.ticker}</div>
+            </td>
+            <td>${h.qty.toLocaleString()}</td>
+            <td>¥${h.avgCost.toLocaleString()}</td>
+            <td>¥${currentPrice.toLocaleString()}</td>
+            <td>¥${value.toLocaleString()}</td>
+            <td class="${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">
+                ${pnl >= 0 ? '+' : ''}${pnl.toLocaleString()}<br>
+                <span style="font-size:11px;">(${pnl >= 0 ? '+' : ''}${pnlPct}%)</span>
+            </td>
+        `;
+        body.appendChild(row);
+    });
+ 
+    if (Object.keys(holdings).length === 0) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:32px;">保有銘柄はありません</td></tr>';
+    }
+ 
+    document.getElementById('p-total-assets').textContent = `¥${(balance + stockValue).toLocaleString()}`;
+    document.getElementById('p-cash').textContent = `¥${balance.toLocaleString()}`;
+    document.getElementById('p-total-pnl').textContent = `¥${totalPnl.toLocaleString()}`;
+    document.getElementById('p-total-pnl').className = 'value ' + (totalPnl >= 0 ? 'pnl-positive' : 'pnl-negative');
+}
  
 /* ─── ログインボーナス ─── */
 function getTodayStr() {
@@ -2230,8 +2077,8 @@ function showToast(msg, type) {
 
 /* ─── 初期化 ─── */
 setInterval(updateMarketTime, 1000);
-setInterval(tickPrices, 2000);
 priceInterval = setInterval(tickPrices, 2000);
+setInterval(checkForWarnings, 5000);
 </script>
 </body>
 </html>

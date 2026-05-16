@@ -1625,6 +1625,7 @@ function saveToLocalStorage() {
         history: tradeHistory,
         lastBonusDate: lastBonusDate || null,
         username: currentUsername || '',
+        bankData: bankData
     }));
 }
  
@@ -1640,6 +1641,7 @@ function loadFromLocalStorage() {
             lastBonusDate = data.lastBonusDate || null;
             currentUsername = data.username || '';
             if (data.company) userCompany = data.company;
+            if (data.bankData) bankData = data.bankData;
         } catch { /* corrupt data, use defaults */ }
     }
     updateBalanceDisplay();
@@ -1658,6 +1660,7 @@ async function loadUserData() {
         lastBonusDate = data.lastBonusDate || null;
         currentUsername = data.username || '';
         if (data.company) userCompany = data.company;
+        if (data.bankData) bankData = data.bankData;
     }
     updateBalanceDisplay();
     updateUsernameDisplay();
@@ -1670,7 +1673,8 @@ async function saveUserData() {
         await update(dbRef(db, `stock_users/${uid}`), {
             balance, holdings,
             lastBonusDate,
-            username: currentUsername
+            username: currentUsername,
+            bankData: bankData
         });
         saveToLocalStorage();
     } catch (e) {
@@ -1916,12 +1920,14 @@ window.clearLoanRequest = async function() {
 
 /* 管理者用：借入申請の読み込みと表示 */
 window.loadLoanRequests = async function() {
+    console.log('Loading loan requests...');
     const adminArea = document.getElementById('admin-loan-requests');
     if (!adminArea) return;
     
     const usersRef = dbRef(db, 'stock_users');
     const snapshot = await get(usersRef);
     const users = snapshot.val();
+    console.log('Fetched users for loan requests:', users ? Object.keys(users).length : 0);
     
     const requests = [];
     for (const uid in users) {

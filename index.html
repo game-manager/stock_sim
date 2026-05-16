@@ -1464,6 +1464,15 @@ window.updateEmail = async function() {
             email: newEmail
         });
         
+        // 管理者の場合は、adminsリストのメールアドレスも更新
+        const adminRef = dbRef(db, `admins/${currentUser.uid}`);
+        const adminSnapshot = await get(adminRef);
+        if (adminSnapshot.exists()) {
+            await update(adminRef, {
+                email: newEmail
+            });
+        }
+        
         document.getElementById('user-email').textContent = newEmail;
         msgEl.textContent = '✅ メールアドレスを更新しました';
         msgEl.style.color = '#34d399';

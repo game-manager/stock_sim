@@ -693,6 +693,58 @@
         .event-body { font-size: 13px; line-height: 1.5; }
         .event-impact { font-size: 11px; color: #9ca3af; margin-top: 8px; font-style: italic; }
 
+        /* ─── 銀行画面 ─── */
+        .bank-container {
+            max-width: 800px; margin: 0 auto;
+        }
+        .bank-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; margin-top: 20px;
+        }
+        .bank-card {
+            background: #111827; border: 1px solid #1e293b;
+            border-radius: 12px; padding: 24px;
+        }
+        .bank-card h3 {
+            color: #60a5fa; font-size: 18px; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .bank-stat {
+            background: #0f172a; border-radius: 8px; padding: 16px;
+            margin-bottom: 20px; text-align: center;
+        }
+        .bank-stat .label { color: #6b7280; font-size: 12px; margin-bottom: 4px; }
+        .bank-stat .value { font-size: 24px; font-weight: bold; color: #e0e8f0; }
+        .bank-form-group { margin-bottom: 16px; }
+        .bank-form-group label { display: block; color: #94a3b8; font-size: 12px; margin-bottom: 6px; }
+        .bank-input-group { display: flex; gap: 8px; }
+        .bank-input {
+            flex: 1; background: #0f172a; border: 1px solid #334155;
+            border-radius: 6px; color: #e0e8f0; padding: 10px; font-size: 14px;
+        }
+        .bank-btn {
+            padding: 10px 20px; border: none; border-radius: 6px;
+            font-weight: bold; cursor: pointer; transition: all 0.2s;
+        }
+        .bank-btn.primary { background: #3b82f6; color: #fff; }
+        .bank-btn.primary:hover { background: #2563eb; }
+        .bank-btn.secondary { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+        .bank-btn.secondary:hover { background: #334155; color: #e0e8f0; }
+        .bank-hint { color: #6b7280; font-size: 11px; margin-top: 8px; line-height: 1.4; }
+        
+        .loan-status-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 999px;
+            font-size: 12px; font-weight: bold; margin-bottom: 12px;
+        }
+        .status-pending { background: #78350f; color: #fbbf24; }
+        .status-approved { background: #064e3b; color: #34d399; }
+        
+        .admin-request-card {
+            background: #1e293b; border: 1px solid #334155;
+            border-radius: 8px; padding: 16px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
 
         /* ─── 株詳細画面 ─── */
         .stock-detail-view {
@@ -870,6 +922,7 @@
         <button class="tab-btn active" data-tab="market">マーケット</button>
         <button class="tab-btn" data-tab="portfolio">ポートフォリオ</button>
         <button class="tab-btn" data-tab="company">会社設立</button>
+        <button class="tab-btn" data-tab="bank">銀行</button>
         <button class="tab-btn" data-tab="settings">設定</button>
     </div>
  
@@ -1022,7 +1075,71 @@
             </div>
         </div>
 
-        <!-- 設定 -->
+        
+        <!-- 銀行 -->
+        <div id="tab-bank" class="tab-content">
+            <div class="bank-container">
+                <h2 style="margin-bottom:8px; color:#e0e8f0;">帝国中央銀行</h2>
+                <p style="color:#6b7280; font-size:14px; margin-bottom:24px;">預金と借入が可能です。利息は一律0.5%（マーケット更新ごと）です。</p>
+                
+                <div class="bank-grid">
+                    <!-- 預金セクション -->
+                    <div class="bank-card">
+                        <h3><span>💰</span> 預金</h3>
+                        <div class="bank-stat">
+                            <div class="label">預金残高</div>
+                            <div class="value" id="bank-deposit-amount">¥0</div>
+                        </div>
+                        <div class="bank-form-group">
+                            <label>金額入力</label>
+                            <div class="bank-input-group">
+                                <input type="number" id="deposit-input" class="bank-input" placeholder="金額を入力">
+                                <button class="bank-btn primary" onclick="handleDeposit()">預ける</button>
+                            </div>
+                        </div>
+                        <div class="bank-form-group">
+                            <div class="bank-input-group">
+                                <input type="number" id="withdraw-input" class="bank-input" placeholder="金額を入力">
+                                <button class="bank-btn secondary" onclick="handleWithdraw()">引き出す</button>
+                            </div>
+                        </div>
+                        <div class="bank-hint">
+                            ※ 預金にはマーケット更新ごとに0.5%の利息がつきます。<br>
+                            ※ 引き出しはいつでも可能です。
+                        </div>
+                    </div>
+
+                    <!-- 借入セクション -->
+                    <div class="bank-card">
+                        <h3><span>🏦</span> 借入</h3>
+                        <div id="loan-status-area"></div>
+                        <div class="bank-stat">
+                            <div class="label">借入残高</div>
+                            <div class="value" id="bank-loan-amount">¥0</div>
+                        </div>
+                        <div class="bank-form-group">
+                            <label>新規借入（要管理者認証）</label>
+                            <div class="bank-input-group">
+                                <input type="number" id="loan-request-input" class="bank-input" placeholder="借入希望額">
+                                <button class="bank-btn primary" id="loan-request-btn" onclick="handleLoanRequest()">申請</button>
+                            </div>
+                        </div>
+                        <div class="bank-form-group">
+                            <label>返済</label>
+                            <div class="bank-input-group">
+                                <input type="number" id="repay-input" class="bank-input" placeholder="返済額">
+                                <button class="bank-btn secondary" onclick="handleRepay()">返済</button>
+                            </div>
+                        </div>
+                        <div class="bank-hint">
+                            ※ 借入にはマーケット更新ごとに0.5%の利息（負債増）が発生します。<br>
+                            ※ 借入には管理者の承認が必要です。承認には数分〜数時間かかる場合があります。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- 設定 -->
         <div id="tab-settings" class="tab-content">
             <h2 style="margin-bottom:24px; color:#e0e8f0;">プロフィール設定</h2>
             
@@ -1085,6 +1202,13 @@
                 </div>
                 
                 <div class="admin-grid">
+                    <div class="admin-card">
+                        <h3>借入申請管理</h3>
+                        <div id="admin-loan-requests" style="max-height: 400px; overflow-y: auto;">
+                            <div style="text-align:center; color:#6b7280; padding:20px;">申請はありません</div>
+                        </div>
+                    </div>
+
                     <div class="admin-card">
                         <h3>プレイヤー検索・操作</h3>
                         <div class="admin-form-group">
@@ -1337,7 +1461,14 @@ let allPlayers     = {};
 let currentUsername = '';
 let allCompanies   = [];
 let activeMultipliers = {}; // イベントによる倍率 { stockId: multiplier }
+
 let selectedStockId = null;
+let bankData = {
+    deposit: 0,
+    loan: 0,
+    loanRequest: null // { amount: 0, status: 'pending', requestedAt: 0 }
+};
+
  
 /* ─── Firebase認証 ─── */
 window.toggleAuthMode = function() {
@@ -1689,6 +1820,172 @@ window.updatePassword = async function() {
     }
 };
 
+
+/* ─── 銀行システム ─── */
+window.handleDeposit = async function() {
+    const input = document.getElementById('deposit-input');
+    const amount = parseInt(input.value);
+    if (isNaN(amount) || amount <= 0) { showToast('有効な金額を入力してください', 'error'); return; }
+    if (amount > balance) { showToast('残高が不足しています', 'error'); return; }
+    
+    balance -= amount;
+    bankData.deposit += amount;
+    input.value = '';
+    updateBalanceDisplay();
+    await saveUserData();
+    showToast(`¥${amount.toLocaleString()} を預け入れました`, 'success');
+};
+
+window.handleWithdraw = async function() {
+    const input = document.getElementById('withdraw-input');
+    const amount = parseInt(input.value);
+    if (isNaN(amount) || amount <= 0) { showToast('有効な金額を入力してください', 'error'); return; }
+    if (amount > bankData.deposit) { showToast('預金残高が不足しています', 'error'); return; }
+    
+    bankData.deposit -= amount;
+    balance += amount;
+    input.value = '';
+    updateBalanceDisplay();
+    await saveUserData();
+    showToast(`¥${amount.toLocaleString()} を引き出しました`, 'success');
+};
+
+window.handleLoanRequest = async function() {
+    if (bankData.loanRequest && bankData.loanRequest.status === 'pending') {
+        showToast('現在申請中の借入があります', 'error');
+        return;
+    }
+    const input = document.getElementById('loan-request-input');
+    const amount = parseInt(input.value);
+    if (isNaN(amount) || amount <= 0) { showToast('有効な金額を入力してください', 'error'); return; }
+    
+    bankData.loanRequest = {
+        amount: amount,
+        status: 'pending',
+        requestedAt: Date.now()
+    };
+    input.value = '';
+    renderLoanStatus();
+    await saveUserData();
+    showToast('借入申請を送信しました。管理者の承認をお待ちください。', 'info');
+};
+
+window.handleRepay = async function() {
+    const input = document.getElementById('repay-input');
+    const amount = parseInt(input.value);
+    if (isNaN(amount) || amount <= 0) { showToast('有効な金額を入力してください', 'error'); return; }
+    if (amount > balance) { showToast('手元の現金が不足しています', 'error'); return; }
+    if (amount > bankData.loan) { showToast('借入残高以上の返済はできません', 'error'); return; }
+    
+    balance -= amount;
+    bankData.loan -= amount;
+    input.value = '';
+    updateBalanceDisplay();
+    await saveUserData();
+    showToast(`¥${amount.toLocaleString()} を返済しました`, 'success');
+};
+
+function renderLoanStatus() {
+    const area = document.getElementById('loan-status-area');
+    if (!area) return;
+    
+    if (!bankData.loanRequest) {
+        area.innerHTML = '';
+        return;
+    }
+    
+    const req = bankData.loanRequest;
+    if (req.status === 'pending') {
+        area.innerHTML = `<div class="loan-status-badge status-pending">申請中: ¥${req.amount.toLocaleString()} (審査中)</div>`;
+    } else if (req.status === 'approved') {
+        area.innerHTML = `<div class="loan-status-badge status-approved">承認済み: ¥${req.amount.toLocaleString()} (残高に反映されました)</div>
+                          <button class="bank-btn secondary" style="font-size:10px; padding:4px 8px; margin-bottom:12px;" onclick="clearLoanRequest()">確認</button>`;
+    }
+}
+
+window.clearLoanRequest = async function() {
+    bankData.loanRequest = null;
+    renderLoanStatus();
+    await saveUserData();
+};
+
+/* 管理者用：借入申請の読み込みと表示 */
+window.loadLoanRequests = async function() {
+    const adminArea = document.getElementById('admin-loan-requests');
+    if (!adminArea) return;
+    
+    const usersRef = dbRef(db, 'stock_users');
+    const snapshot = await get(usersRef);
+    const users = snapshot.val();
+    
+    const requests = [];
+    for (const uid in users) {
+        const u = users[uid];
+        if (u.bankData && u.bankData.loanRequest && u.bankData.loanRequest.status === 'pending') {
+            requests.push({ uid, ...u });
+        }
+    }
+    
+    if (requests.length === 0) {
+        adminArea.innerHTML = '<div style="text-align:center; color:#6b7280; padding:20px;">申請はありません</div>';
+        return;
+    }
+    
+    adminArea.innerHTML = requests.map(r => `
+        <div class="admin-request-card">
+            <div>
+                <div style="font-weight:bold; color:#e0e8f0;">${r.username || r.email}</div>
+                <div style="font-size:12px; color:#94a3b8;">申請額: ¥${r.bankData.loanRequest.amount.toLocaleString()}</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="bank-btn primary" style="padding:6px 12px; font-size:12px;" onclick="approveLoan('${r.uid}')">承認</button>
+                <button class="bank-btn secondary" style="padding:6px 12px; font-size:12px;" onclick="rejectLoan('${r.uid}')">却下</button>
+            </div>
+        </div>
+    `).join('');
+};
+
+window.approveLoan = async function(uid) {
+    try {
+        const userRef = dbRef(db, `stock_users/${uid}`);
+        const snapshot = await get(userRef);
+        const u = snapshot.val();
+        
+        if (u.bankData && u.bankData.loanRequest) {
+            const amount = u.bankData.loanRequest.amount;
+            u.balance += amount;
+            u.bankData.loan += amount;
+            u.bankData.loanRequest.status = 'approved';
+            
+            await update(userRef, {
+                balance: u.balance,
+                bankData: u.bankData
+            });
+            showToast('申請を承認しました', 'success');
+            loadLoanRequests();
+        }
+    } catch (e) {
+        showToast('承認に失敗しました: ' + e.message, 'error');
+    }
+};
+
+window.rejectLoan = async function(uid) {
+    try {
+        const userRef = dbRef(db, `stock_users/${uid}`);
+        const snapshot = await get(userRef);
+        const u = snapshot.val();
+        
+        if (u.bankData && u.bankData.loanRequest) {
+            u.bankData.loanRequest = null;
+            await update(userRef, { bankData: u.bankData });
+            showToast('申請を却下しました', 'info');
+            loadLoanRequests();
+        }
+    } catch (e) {
+        showToast('操作に失敗しました: ' + e.message, 'error');
+    }
+};
+
 /* ─── タブ・管理者ページ切り替え ─── */
 function showGameTab(tab) {
     document.getElementById('admin-page').classList.remove('active');
@@ -1717,6 +2014,7 @@ window.openAdminPage = async function() {
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
         await window.loadAllPlayers();
+        await window.loadLoanRequests();
         renderCompaniesTable();
     } else if (currentUser) {
         // ゲームログイン中のユーザーが管理者かを自動チェック
@@ -1799,7 +2097,7 @@ window.createCompany = async function() {
         await set(dbRef(db, `companies/${companyId}`), newCompany);
         await update(dbRef(db, `stock_users/${currentUser.uid}`), {
             company: newCompany,
-            balance: balance
+            balance: balance, bankData: bankData
         });
  
         showToast('🎉 会社を設立し、上場しました！', 'success');
@@ -2211,7 +2509,19 @@ function tickPrices() {
     });
     renderMarket();
     updatePortfolio();
+    
     if (selectedStockId) renderStockDetail(selectedStockId);
+    
+    // 銀行利息計算 (0.5%)
+    if (bankData.deposit > 0) {
+        bankData.deposit = Math.floor(bankData.deposit * 1.005);
+    }
+    if (bankData.loan > 0) {
+        bankData.loan = Math.floor(bankData.loan * 1.005);
+    }
+    updateBalanceDisplay();
+    saveUserData();
+
 }
 
 /* ─── イベントシステム ─── */

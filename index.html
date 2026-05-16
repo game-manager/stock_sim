@@ -881,6 +881,37 @@
             </div>
         </div>
 
+        <!-- 設定 -->
+        <div id="tab-settings" class="tab-content">
+            <h2 style="margin-bottom:24px; color:#e0e8f0;">プロフィール設定</h2>
+            
+            <div class="settings-card">
+                <h3 style="color:#e0e8f0; margin-bottom:16px;">基本情報</h3>
+                
+                <div class="form-group">
+                    <label>ユーザー名</label>
+                    <input type="text" id="settings-username" placeholder="ユーザー名を入力">
+                    <button class="settings-btn" onclick="updateUsername()">ユーザー名を更新</button>
+                    <div id="settings-username-msg" style="font-size:12px; margin-top:8px; min-height:18px;"></div>
+                </div>
+
+                <div class="form-group" style="margin-top:24px;">
+                    <label>メールアドレス</label>
+                    <input type="email" id="settings-email" placeholder="新しいメールアドレス">
+                    <button class="settings-btn" onclick="updateEmail()">メールアドレスを更新</button>
+                    <div id="settings-email-msg" style="font-size:12px; margin-top:8px; min-height:18px;"></div>
+                </div>
+
+                <div class="form-group" style="margin-top:24px;">
+                    <label>パスワード変更</label>
+                    <input type="password" id="settings-current-password" placeholder="現在のパスワード">
+                    <input type="password" id="settings-new-password" placeholder="新しいパスワード（6文字以上）" style="margin-top:8px;">
+                    <button class="settings-btn" onclick="updatePassword()">パスワードを変更</button>
+                    <div id="settings-password-msg" style="font-size:12px; margin-top:8px; min-height:18px;"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- 管理者ページ -->
         <div id="admin-page" class="admin-page">
             <!-- 未認証時 -->

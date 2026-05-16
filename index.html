@@ -2035,6 +2035,7 @@ window.openAdminPage = async function() {
                 document.getElementById('admin-login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
                 await window.loadAllPlayers();
+                await window.loadLoanRequests();
                 renderCompaniesTable();
                 showToast('✅ 管理者権限で自動ログインしました', 'success');
                 return;
@@ -2157,6 +2158,7 @@ window.loginAsAdmin = async function() {
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
         await window.loadAllPlayers();
+        await window.loadLoanRequests();
         renderCompaniesTable();
         showToast('✅ 管理者として認証されました', 'success');
     } catch (e) {

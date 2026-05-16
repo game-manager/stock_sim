@@ -2248,6 +2248,16 @@ function renderMarket() {
             card.style.borderColor = activeMultipliers[s.id] > 1.0 ? "#34d39988" : "#f8717188";
         }
         grid.appendChild(card);
+        
+        // 保存した入力値を復元
+        const buyInput = card.querySelector('input[data-type="buy"]');
+        const sellInput = card.querySelector('input[data-type="sell"]');
+        if (buyInput && savedInputs[`${s.id}-buy`]) {
+            buyInput.value = savedInputs[`${s.id}-buy`];
+        }
+        if (sellInput && savedInputs[`${s.id}-sell`]) {
+            sellInput.value = savedInputs[`${s.id}-sell`];
+        }
     });
  
     grid.querySelectorAll('.buy-btn').forEach(btn => {

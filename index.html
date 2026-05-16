@@ -240,22 +240,25 @@
         .stock-holding-badge .holding-icon { font-size: 10px; }
  
         .stock-actions {
-            display: flex; gap: 8px; margin-top: 12px;
+            display: flex; flex-direction: column; gap: 8px; margin-top: 12px;
+            padding: 12px; background: #0f172a; border: 1px solid #1e293b;
+            border-radius: 8px;
         }
         .trade-input-group {
-            display: flex; gap: 4px; align-items: center; width: 100%;
+            display: flex; gap: 6px; align-items: center; width: 100%;
         }
         .trade-input-group input {
-            flex: 1; padding: 6px 8px;
-            background: #0f172a; border: 1px solid #1e293b;
+            flex: 1; padding: 8px 10px;
+            background: #1a2332; border: 1px solid #334155;
             border-radius: 4px; color: #e0e8f0;
             font-size: 12px;
         }
         .trade-input-group input:focus {
             outline: none; border-color: #3b82f6;
+            box-shadow: 0 0 0 2px #3b82f633;
         }
         .buy-btn, .sell-btn {
-            flex: 1; padding: 8px 0;
+            flex: 1; padding: 10px 8px;
             border: none; border-radius: 6px;
             font-size: 12px; font-weight: bold;
             cursor: pointer; transition: all 0.15s;
@@ -2231,12 +2234,12 @@ function renderMarket() {
             <div class="mini-chart">${buildMiniChart(hist)}</div>
             <div class="stock-actions">
                 <div class="trade-input-group">
-                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="buy" placeholder="数量" min="1" value="1">
-                    <button class="buy-btn" data-id="${s.id}">買う</button>
+                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="buy" placeholder="数量" min="1" value="1" style="width: 50px;">
+                    <button class="buy-btn" data-id="${s.id}" style="flex: 1;">買う</button>
                 </div>
                 <div class="trade-input-group">
-                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="sell" placeholder="数量" min="1" value="1">
-                    <button class="sell-btn" data-id="${s.id}">売る</button>
+                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="sell" placeholder="数量" min="1" value="1" style="width: 50px;">
+                    <button class="sell-btn" data-id="${s.id}" style="flex: 1;">売る</button>
                 </div>
             </div>
         `;

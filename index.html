@@ -1156,6 +1156,7 @@ onAuthStateChanged(auth, async (user) => {
             console.warn('Firebase load failed, using localStorage fallback:', e.message);
             loadFromLocalStorage();
         }
+        await loadAllCompanies();
         initMarket();
     } else {
         currentUser = null;
@@ -1219,7 +1220,6 @@ async function loadUserData() {
         currentUsername = data.username || '';
         if (data.company) {
             userCompany = data.company;
-            await publishCompany(userCompany);
         }
     } else {
         loadFromLocalStorage();
@@ -1740,15 +1740,7 @@ function updatePlayersTable() {
     });
 }
 
-async function loadAllCompanies() {
-    try {
-        const snap = await get(dbRef(db, 'companies'));
-        allCompanies = snap.exists() ? Object.values(snap.val()) : [];
-        updateCompaniesTable();
-    } catch (e) {
-        console.warn('Failed to load companies:', e.message);
-    }
-}
+
 
 function updateCompaniesTable() {
     const tbody = document.getElementById('companies-body');

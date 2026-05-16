@@ -1336,20 +1336,43 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => showGameTab(btn.dataset.tab));
 });
 
-window.openAdminPage = function() {
+window.openAdminPage = async function() {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('admin-page').classList.add('active');
     
-    // 誰でもログイン画面にアクセス可能
     if (isAdmin) {
         // 既に認証済み → パネル表示
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
-        window.loadAllPlayers();
+        await window.loadAllPlayers();
         renderCompaniesTable();
+    } else if (currentUser) {
+        // ゲームログイン中のユーザーが管理者かを自動チェック
+        try {
+            const adminRef = dbRef(db, `admins/${currentUser.uid}`);
+            const adminSnapshot = await get(adminRef);
+            
+            if (adminSnapshot.exists()) {
+                // 管理者権限あり → 自動認証してパネル表示
+                isAdmin = true;
+                document.getElementById('admin-login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                await window.loadAllPlayers();
+                renderCompaniesTable();
+                showToast('✅ 管理者権限で自動ログインしました', 'success');
+                return;
+            }
+        } catch (e) {
+            console.log('Auto-admin check failed:', e.message);
+        }
+        
+        // 管理者権限なし → ログイン画面表示
+        document.getElementById('admin-login-screen').style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('admin-login-error').textContent = '';
     } else {
-        // 未認証 → ログイン画面表示
+        // ゲームにログインしていない → ログイン画面表示
         document.getElementById('admin-login-screen').style.display = 'block';
         document.getElementById('admin-panel').style.display = 'none';
         document.getElementById('admin-login-error').textContent = '';
@@ -1435,7 +1458,7 @@ window.loginAsAdmin = async function() {
         isAdmin = true;
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
-        window.loadAllPlayers();
+        await window.loadAllPlayers();
         renderCompaniesTable();
         showToast('✅ 管理者として認証されました', 'success');
     } catch (e) {

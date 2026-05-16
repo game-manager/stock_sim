@@ -1346,7 +1346,7 @@ window.openAdminPage = function() {
         // 既に認証済み → パネル表示
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
-        loadAllPlayers();
+        window.loadAllPlayers();
         renderCompaniesTable();
     } else {
         // 未認証 → ログイン画面表示
@@ -1435,7 +1435,7 @@ window.loginAsAdmin = async function() {
         isAdmin = true;
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
-        loadAllPlayers();
+        window.loadAllPlayers();
         renderCompaniesTable();
         showToast('✅ 管理者として認証されました', 'success');
     } catch (e) {
@@ -1533,15 +1533,24 @@ window.deleteCompanyFromAdmin = async function(companyId, companyName) {
 };
 
 /* ─── 管理者機能 ─── */
-async function loadAllPlayers() {
+window.loadAllPlayers = async function() {
+    console.log('Attempting to load all players...');
+    const body = document.getElementById('players-body');
+    if (body) body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#3b82f6;padding:32px;">データを読み込み中...</td></tr>';
+    
     try {
         const snap = await get(dbRef(db, 'stock_users'));
         if (snap.exists()) {
             allPlayers = snap.val();
+            console.log('Players loaded:', Object.keys(allPlayers).length);
             renderPlayersTable();
+        } else {
+            console.log('No players found in database.');
+            if (body) body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#6b7280;padding:32px;">プレイヤーが見つかりません</td></tr>';
         }
     } catch (e) {
-        console.warn('Failed to load players:', e.message);
+        console.error('Failed to load players:', e.message);
+        if (body) body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#f87171;padding:32px;">読み込み失敗: ${e.message}</td></tr>`;
     }
 }
 
@@ -1596,7 +1605,7 @@ window.addPlayer = async function() {
         showToast(`✅ プレイヤー ${email} を追加しました`, 'success');
         document.getElementById('new-player-email').value = '';
         document.getElementById('new-player-balance').value = '10000000';
-        await loadAllPlayers();
+        await window.loadAllPlayers();
     } catch (e) {
         showToast('プレイヤー追加に失敗しました: ' + e.message, 'error');
     }
@@ -1625,7 +1634,7 @@ window.adjustPlayerBalance = async function() {
         showToast(`✅ 残高を調整しました (${amountStr})`, 'success');
         document.getElementById('adjust-player-uid').value = '';
         document.getElementById('adjust-amount').value = '';
-        await loadAllPlayers();
+        await window.loadAllPlayers();
     } catch (e) {
         showToast('残高調整に失敗しました: ' + e.message, 'error');
     }
@@ -1669,7 +1678,7 @@ window.deletePlayer = async function(uid, name) {
     try {
         await set(dbRef(db, `stock_users/${uid}`), null);
         showToast(`✅ プレイヤー「${name}」を削除しました`, 'success');
-        await loadAllPlayers();
+        await window.loadAllPlayers();
     } catch (e) {
         showToast('プレイヤー削除に失敗しました: ' + e.message, 'error');
     }

@@ -1592,12 +1592,33 @@ onAuthStateChanged(auth, async (user) => {
         // 管理者認証フラグをリセット（新規ログイン時は管理者パネルにアクセスできない）
         isAdmin = false;
         
-        try {
-            await loadUserData();
-        } catch (e) {
-            console.warn('Firebase load failed, using localStorage fallback:', e.message);
+        // ユーザーデータのリアルタイム同期
+        const userDataRef = dbRef(db, `stock_users/${user.uid}`);
+        onValue(userDataRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                balance = data.balance ?? 10000000;
+                holdings = data.holdings ?? {};
+                tradeHistory = data.history ? Object.values(data.history) : [];
+                lastBonusDate = data.lastBonusDate || null;
+                currentUsername = data.username || '';
+                if (data.company) userCompany = data.company;
+                if (data.bankData) bankData = data.bankData;
+                
+                updateBalanceDisplay();
+                updateUsernameDisplay();
+                if (document.getElementById('bank-deposit-amount')) {
+                    renderLoanStatus();
+                }
+            } else {
+                // 初回ログインなどの場合
+                updateBalanceDisplay();
+                updateUsernameDisplay();
+            }
+        }, (error) => {
+            console.warn('Firebase sync failed, using localStorage fallback:', error.message);
             loadFromLocalStorage();
-        }
+        });
         checkLoginBonus();
         initMarket();
         startEventSystem();
@@ -2526,14 +2547,20 @@ function tickPrices() {
     if (selectedStockId) renderStockDetail(selectedStockId);
     
     // 銀行利息計算 (0.5%)
+    let changed = false;
     if (bankData.deposit > 0) {
         bankData.deposit = Math.floor(bankData.deposit * 1.005);
+        changed = true;
     }
     if (bankData.loan > 0) {
         bankData.loan = Math.floor(bankData.loan * 1.005);
+        changed = true;
     }
-    updateBalanceDisplay();
-    saveUserData();
+    if (changed) {
+        // saveUserData を直接呼ぶと他のフィールドも上書きするので注意が必要だが、
+        // リアルタイム同期中なので、現在のローカル変数は最新のはず。
+        saveUserData();
+    }
 
 }
 

@@ -851,20 +851,14 @@
             <!-- 未認証時 -->
             <div id="admin-login-screen" class="admin-login-box">
                 <div class="admin-login-icon">🔐</div>
-                <div class="admin-login-title">管理者認証</div>
-                <div class="admin-login-desc">管理者用メールアドレスとパスワードを入力してください</div>
-                <div class="admin-login-form">
-                    <div class="form-group">
-                        <label>メールアドレス</label>
-                        <input type="email" id="admin-login-email" placeholder="admin@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label>パスワード</label>
-                        <input type="password" id="admin-login-password" placeholder="••••••••" onkeypress="if(event.key==='Enter') loginAsAdmin()">
-                    </div>
-                    <div id="admin-login-error" style="color:#f87171;font-size:12px;margin-bottom:12px;min-height:18px;"></div>
-                    <button class="admin-login-btn" onclick="loginAsAdmin()">管理者として認証</button>
+                <div class="admin-login-title">管理者ページ</div>
+                <div class="admin-login-desc">このページは管理者のみがアクセスできます。</div>
+                <div style="color:#94a3b8; font-size:14px; margin:20px 0; padding:16px; background:#1e293b; border-radius:8px; border-left:4px solid #3b82f6;">
+                    <strong>現在のログインユーザー:</strong><br>
+                    <span id="current-login-email" style="font-family:monospace;">未ログイン</span>
                 </div>
+                <div id="admin-login-error" style="color:#f87171;font-size:12px;margin-bottom:12px;min-height:18px;"></div>
+                <p style="color:#6b7280; font-size:12px; text-align:center;">管理者権限を持つアカウントでログインしてください。</p>
             </div>
 
             <!-- 認証済み -->
@@ -1201,10 +1195,12 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('user-email').textContent = user.email;
         
         // ヘッダーの管理者バッジ表示（特定アカウントのみ）
-        const isSystemAdmin = ADMIN_UIDS.includes(user.uid) || user.email.toLowerCase() === 'admin@example.com';
+        const isSystemAdmin = ADMIN_UIDS.includes(user.uid);
         if (isSystemAdmin) {
             document.getElementById('admin-badge').style.display = 'inline-block';
         }
+        // 管理者認証フラグをリセット（ページ遷移時に再認証が必要）
+        isAdmin = false;
         
         try {
             await loadUserData();
@@ -1323,10 +1319,31 @@ window.openAdminPage = function() {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('admin-page').classList.add('active');
-
-    if (isAdmin) {
+    
+    // 管理者権限チェック
+    const errEl = document.getElementById('admin-login-error');
+    if (!currentUser) {
+        errEl.textContent = 'ログインしてください';
+        document.getElementById('admin-login-screen').style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'none';
+        return;
+    }
+    
+    const isSystemAdmin = ADMIN_UIDS.includes(currentUser.uid);
+    document.getElementById('current-login-email').textContent = currentUser.email;
+    
+    if (isSystemAdmin && isAdmin) {
         loadAllPlayers();
         renderCompaniesTable();
+    } else if (isSystemAdmin && !isAdmin) {
+        // 管理者権限あり、未認証 → 認証画面表示
+        document.getElementById('admin-login-screen').style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'none';
+    } else {
+        // 管理者権限なし
+        errEl.textContent = `このアカウント(${currentUser.email})は管理者権限がありません`;
+        document.getElementById('admin-login-screen').style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'none';
     }
 };
 
@@ -1378,21 +1395,34 @@ window.createCompany = async function() {
     }
 };
 
-/* ─── 管理者認証（管理者ページ内） ─── */
-window.loginAsAdmin = function() {
-    const email = document.getElementById('admin-login-email').value.trim();
-    const pass = document.getElementById('admin-login-password').value;
+/* ─── 管理者認証（Firebase Authベース） ─── */
+window.checkAdminAccess = function() {
     const errEl = document.getElementById('admin-login-error');
     
-    if (email === ADMIN_EMAIL && pass === ADMIN_PASSWORD) {
+    if (!currentUser) {
+        errEl.textContent = 'ログインしてください';
+        return false;
+    }
+    
+    // 管理者UIDリストに含まれるかチェック
+    const isSystemAdmin = ADMIN_UIDS.includes(currentUser.uid);
+    
+    if (!isSystemAdmin) {
+        errEl.textContent = `このアカウント(${currentUser.email})は管理者権限がありません`;
+        return false;
+    }
+    
+    return true;
+};
+
+window.loginAsAdmin = function() {
+    if (checkAdminAccess()) {
         isAdmin = true;
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
         loadAllPlayers();
         renderCompaniesTable();
         showToast('✅ 管理者として認証されました', 'success');
-    } else {
-        errEl.textContent = 'メールアドレスまたはパスワードが正しくありません';
     }
 };
 
@@ -1400,7 +1430,8 @@ window.logoutAdmin = function() {
     isAdmin = false;
     document.getElementById('admin-login-screen').style.display = 'block';
     document.getElementById('admin-panel').style.display = 'none';
-    showToast('認証を解除しました', 'info');
+    document.getElementById('admin-login-error').textContent = '';
+    showToast('管理者認証を解除しました', 'info');
 };
 
 /* ─── 管理者ページ内の企業管理 ─── */

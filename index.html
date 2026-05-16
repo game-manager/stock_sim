@@ -694,6 +694,94 @@
         .event-impact { font-size: 11px; color: #9ca3af; margin-top: 8px; font-style: italic; }
 
 
+        /* ─── 株詳細画面 ─── */
+        .stock-detail-view {
+            display: none;
+        }
+        .stock-detail-view.active {
+            display: block;
+        }
+        .stock-detail-header {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 16px; margin-bottom: 16px;
+        }
+        .stock-detail-title-row {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .stock-detail-title {
+            font-size: 22px; color: #e0e8f0; font-weight: bold;
+        }
+        .stock-detail-ticker {
+            color: #94a3b8; font-size: 12px;
+            border: 1px solid #334155; border-radius: 999px;
+            padding: 4px 10px; background: #0f172a;
+        }
+        .stock-detail-sector {
+            color: #6b7280; font-size: 13px; margin-top: 4px;
+        }
+        .detail-back-btn {
+            padding: 8px 16px; background: #1e293b; color: #94a3b8;
+            border: 1px solid #334155; border-radius: 6px;
+            font-size: 12px; cursor: pointer; transition: all 0.2s;
+        }
+        .detail-back-btn:hover { background: #334155; color: #e0e8f0; }
+        .stock-detail-grid {
+            display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+            gap: 16px;
+        }
+        .detail-panel {
+            background: #111827; border: 1px solid #1e293b;
+            border-radius: 12px; padding: 18px 20px;
+        }
+        .detail-panel h3 {
+            color: #94a3b8; font-size: 13px; letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+        .detail-price-main {
+            font-size: 34px; font-weight: bold; color: #e0e8f0;
+            margin-bottom: 4px;
+        }
+        .detail-stat-grid {
+            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px; margin-top: 16px;
+        }
+        .detail-stat {
+            background: #0f172a; border: 1px solid #1e293b;
+            border-radius: 8px; padding: 10px 12px;
+        }
+        .detail-stat .label {
+            color: #6b7280; font-size: 11px; margin-bottom: 4px;
+        }
+        .detail-stat .value {
+            color: #e0e8f0; font-size: 15px; font-weight: bold;
+        }
+        .detail-chart-wrap {
+            height: 320px; position: relative;
+        }
+        .detail-chart {
+            width: 100%; height: 100%; display: block;
+        }
+        .detail-chart-empty {
+            height: 320px; display: flex; align-items: center; justify-content: center;
+            color: #6b7280; font-size: 13px;
+        }
+        .detail-trade-actions {
+            display: flex; gap: 10px; margin-top: 18px;
+        }
+        .detail-trade-actions .buy-btn,
+        .detail-trade-actions .sell-btn {
+            padding: 12px 0; font-size: 13px;
+        }
+        .click-hint {
+            color: #64748b; font-size: 11px; margin-top: 8px;
+        }
+        @media (max-width: 860px) {
+            .stock-detail-grid { grid-template-columns: 1fr; }
+            .stock-detail-header { align-items: flex-start; flex-direction: column; }
+            .detail-back-btn { width: 100%; }
+        }
+
+
         /* ─── 設定画面 ─── */
         .settings-card {
             background: #111827; border: 1px solid #1e293b;
@@ -804,8 +892,59 @@
                 </div>
             </div>
  
-            <div class="stock-grid" id="stock-grid">
-                <!-- JSで生成 -->
+            <div id="market-list-view">
+                <div class="stock-grid" id="stock-grid">
+                    <!-- JSで生成 -->
+                </div>
+            </div>
+
+            <div id="stock-detail-view" class="stock-detail-view">
+                <div class="stock-detail-header">
+                    <div>
+                        <div class="stock-detail-title-row">
+                            <span class="stock-detail-title" id="detail-stock-name">-</span>
+                            <span class="stock-detail-ticker" id="detail-stock-ticker">-</span>
+                        </div>
+                        <div class="stock-detail-sector" id="detail-stock-sector">-</div>
+                    </div>
+                    <button class="detail-back-btn" onclick="closeStockDetail()">一覧に戻る</button>
+                </div>
+
+                <div class="stock-detail-grid">
+                    <div class="detail-panel">
+                        <h3>過去の株価</h3>
+                        <div id="detail-chart-area" class="detail-chart-wrap"></div>
+                        <div class="click-hint">株価はマーケット更新ごとに自動で追加されます。</div>
+                    </div>
+
+                    <div class="detail-panel">
+                        <h3>銘柄情報・取引</h3>
+                        <div class="detail-price-main" id="detail-current-price">¥0</div>
+                        <div id="detail-price-change" class="stock-change flat">±0 (0.00%)</div>
+                        <div class="detail-stat-grid">
+                            <div class="detail-stat">
+                                <div class="label">保有株数</div>
+                                <div class="value" id="detail-holding-qty">0株</div>
+                            </div>
+                            <div class="detail-stat">
+                                <div class="label">保有評価額</div>
+                                <div class="value" id="detail-holding-value">¥0</div>
+                            </div>
+                            <div class="detail-stat">
+                                <div class="label">平均取得単価</div>
+                                <div class="value" id="detail-avg-cost">-</div>
+                            </div>
+                            <div class="detail-stat">
+                                <div class="label">評価損益</div>
+                                <div class="value" id="detail-pnl">¥0</div>
+                            </div>
+                        </div>
+                        <div class="detail-trade-actions">
+                            <button class="buy-btn" id="detail-buy-btn">買う</button>
+                            <button class="sell-btn" id="detail-sell-btn">売る</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
  
@@ -1198,6 +1337,7 @@ let allPlayers     = {};
 let currentUsername = '';
 let allCompanies   = [];
 let activeMultipliers = {}; // イベントによる倍率 { stockId: multiplier }
+let selectedStockId = null;
  
 /* ─── Firebase認証 ─── */
 window.toggleAuthMode = function() {
@@ -1988,7 +2128,7 @@ async function initMarket() {
     FAMOUS_STOCKS.forEach(s => {
         if (!stockPrices[s.id]) {
             stockPrices[s.id] = s.basePrice;
-            priceHistory[s.id] = Array(20).fill(0).map(() =>
+            priceHistory[s.id] = Array(40).fill(0).map(() =>
                 s.basePrice + (Math.random() - 0.5) * s.basePrice * 0.02
             );
         }
@@ -2020,8 +2160,8 @@ async function loadPublicCompanies() {
                     });
                     if (!stockPrices[c.id]) {
                         stockPrices[c.id] = c.initialPrice;
-                        priceHistory[c.id] = Array(21).fill(c.initialPrice).map((p, i) =>
-                            i < 20 ? p + (Math.random() - 0.5) * p * 0.02 : p
+                        priceHistory[c.id] = Array(40).fill(c.initialPrice).map((p, i) =>
+                            i < 39 ? p + (Math.random() - 0.5) * p * 0.02 : p
                         );
                     }
                     existingIds.add(c.id);
@@ -2067,10 +2207,11 @@ function tickPrices() {
  
         if (!priceHistory[s.id]) priceHistory[s.id] = [];
         priceHistory[s.id].push(newPrice);
-        if (priceHistory[s.id].length > 21) priceHistory[s.id].shift();
+        if (priceHistory[s.id].length > 60) priceHistory[s.id].shift();
     });
     renderMarket();
     updatePortfolio();
+    if (selectedStockId) renderStockDetail(selectedStockId);
 }
 
 /* ─── イベントシステム ─── */
@@ -2150,6 +2291,7 @@ function showEventNotification(title, body, type, target) {
  
 /* ─── マーケットフィルター ─── */
 window.filterMarket = function(filter) {
+    if (selectedStockId) closeStockDetail();
     marketFilter = filter;
     document.querySelectorAll('.market-sub-tab').forEach(b => b.classList.remove('active'));
     document.querySelector(`.market-sub-tab[data-filter="${filter}"]`).classList.add('active');
@@ -2226,6 +2368,7 @@ function renderMarket() {
             card.style.boxShadow = activeMultipliers[s.id] > 1.0 ? "0 0 15px #34d39944" : "0 0 15px #f8717144";
             card.style.borderColor = activeMultipliers[s.id] > 1.0 ? "#34d39988" : "#f8717188";
         }
+        card.addEventListener('click', () => openStockDetail(s.id));
         grid.appendChild(card);
     });
  
@@ -2243,6 +2386,109 @@ function renderMarket() {
     });
 }
  
+
+window.openStockDetail = function(stockId) {
+    selectedStockId = stockId;
+    document.getElementById('market-list-view').style.display = 'none';
+    document.getElementById('stock-detail-view').classList.add('active');
+    renderStockDetail(stockId);
+};
+
+window.closeStockDetail = function() {
+    selectedStockId = null;
+    document.getElementById('stock-detail-view').classList.remove('active');
+    document.getElementById('market-list-view').style.display = '';
+};
+
+function renderStockDetail(stockId) {
+    const stock = allStocks.find(s => s.id === stockId);
+    if (!stock) {
+        closeStockDetail();
+        return;
+    }
+
+    const price = stockPrices[stockId] || stock.basePrice;
+    const hist = priceHistory[stockId] || [price];
+    const first = hist[0] || price;
+    const prev = hist.length >= 2 ? hist[hist.length - 2] : price;
+    const change = price - prev;
+    const changePct = prev ? ((change / prev) * 100).toFixed(2) : '0.00';
+    const totalChange = price - first;
+    const totalChangePct = first ? ((totalChange / first) * 100).toFixed(2) : '0.00';
+    const h = holdings[stockId] || { qty: 0, avgCost: 0 };
+    const holdingValue = h.qty * price;
+    const pnl = h.qty ? (price - h.avgCost) * h.qty : 0;
+    const ownerLabel = stock.ownerUsername || (stock.ownerEmail ? stock.ownerEmail.split('@')[0] : '');
+    const sectorText = stock.isUserCompany
+        ? `${stock.sector || 'プレイヤー企業'}${ownerLabel ? ' · ' + ownerLabel + 'の会社' : ''}`
+        : (stock.sector || '主要企業');
+
+    document.getElementById('detail-stock-name').textContent = stock.name;
+    document.getElementById('detail-stock-ticker').textContent = stock.ticker;
+    document.getElementById('detail-stock-sector').textContent = sectorText;
+    document.getElementById('detail-current-price').textContent = `¥${price.toLocaleString()}`;
+
+    const changeEl = document.getElementById('detail-price-change');
+    changeEl.className = `stock-change ${change > 0 ? 'up' : change < 0 ? 'down' : 'flat'}`;
+    changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toLocaleString()} (${change >= 0 ? '+' : ''}${changePct}%) / 履歴開始比 ${totalChange >= 0 ? '+' : ''}${totalChange.toLocaleString()} (${totalChange >= 0 ? '+' : ''}${totalChangePct}%)`;
+
+    document.getElementById('detail-holding-qty').textContent = `${(h.qty || 0).toLocaleString()}株`;
+    document.getElementById('detail-holding-value').textContent = `¥${holdingValue.toLocaleString()}`;
+    document.getElementById('detail-avg-cost').textContent = h.qty ? `¥${h.avgCost.toLocaleString()}` : '-';
+    const pnlEl = document.getElementById('detail-pnl');
+    pnlEl.textContent = `${pnl >= 0 ? '+' : ''}¥${pnl.toLocaleString()}`;
+    pnlEl.className = `value ${pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}`;
+
+    document.getElementById('detail-buy-btn').onclick = () => openModal('buy', stockId);
+    document.getElementById('detail-sell-btn').onclick = () => openModal('sell', stockId);
+    document.getElementById('detail-chart-area').innerHTML = buildDetailChart(hist);
+}
+
+function buildDetailChart(hist) {
+    if (!hist || hist.length < 2) {
+        return '<div class="detail-chart-empty">株価履歴がまだありません</div>';
+    }
+
+    const width = 760;
+    const height = 300;
+    const padL = 56;
+    const padR = 18;
+    const padT = 18;
+    const padB = 38;
+    const min = Math.min(...hist);
+    const max = Math.max(...hist);
+    const range = max - min || 1;
+    const plotW = width - padL - padR;
+    const plotH = height - padT - padB;
+    const points = hist.map((v, i) => {
+        const x = padL + (hist.length === 1 ? 0 : (i / (hist.length - 1)) * plotW);
+        const y = padT + ((max - v) / range) * plotH;
+        return `${x.toFixed(2)},${y.toFixed(2)}`;
+    }).join(' ');
+    const areaPoints = `${padL},${height - padB} ${points} ${width - padR},${height - padB}`;
+    const last = hist[hist.length - 1];
+    const first = hist[0];
+    const stroke = last >= first ? '#34d399' : '#f87171';
+    const fill = last >= first ? '#34d39922' : '#f8717122';
+    const gridLines = [0, 1, 2, 3, 4].map(i => {
+        const y = padT + (i / 4) * plotH;
+        const value = Math.round(max - (i / 4) * range);
+        return `<line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="#1e293b" stroke-width="1"/><text x="${padL - 8}" y="${y + 4}" fill="#64748b" font-size="11" text-anchor="end">¥${value.toLocaleString()}</text>`;
+    }).join('');
+    const lastX = width - padR;
+    const lastY = padT + ((max - last) / range) * plotH;
+
+    return `<svg class="detail-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="過去株価チャート">
+        <rect x="0" y="0" width="${width}" height="${height}" fill="#0f172a" rx="10"></rect>
+        ${gridLines}
+        <polyline points="${areaPoints}" fill="${fill}" stroke="none"></polyline>
+        <polyline points="${points}" fill="none" stroke="${stroke}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        <circle cx="${lastX}" cy="${lastY}" r="5" fill="${stroke}"></circle>
+        <text x="${padL}" y="${height - 12}" fill="#64748b" font-size="11">${hist.length}回分の価格履歴</text>
+        <text x="${width - padR}" y="${height - 12}" fill="#94a3b8" font-size="11" text-anchor="end">現在 ¥${last.toLocaleString()}</text>
+    </svg>`;
+}
+
 function buildMiniChart(hist) {
     if (hist.length < 2) return '';
     const min = Math.min(...hist);
@@ -2333,11 +2579,14 @@ window.executeTrade = async function() {
         if (h.qty === 0) delete holdings[tradeStockId];
     }
  
+    const executedMode = tradeMode;
     await saveUserData();
     updateBalanceDisplay();
     closeModal();
-    showToast(tradeMode === 'buy' ? '購入しました' : '売却しました', 'success');
+    showToast(executedMode === 'buy' ? '購入しました' : '売却しました', 'success');
     updatePortfolio();
+    renderMarket();
+    if (selectedStockId) renderStockDetail(selectedStockId);
 };
  
 /* ─── ポートフォリオ更新 ─── */

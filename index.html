@@ -1349,12 +1349,14 @@ window.openAdminPage = async function() {
         renderCompaniesTable();
     } else if (currentUser) {
         // ゲームログイン中のユーザーが管理者かを自動チェック
+        console.log('Checking admin status for user:', currentUser.uid);
         try {
             const adminRef = dbRef(db, `admins/${currentUser.uid}`);
             const adminSnapshot = await get(adminRef);
             
             if (adminSnapshot.exists()) {
                 // 管理者権限あり → 自動認証してパネル表示
+                console.log('Admin status confirmed, showing panel');
                 isAdmin = true;
                 document.getElementById('admin-login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
@@ -1362,9 +1364,19 @@ window.openAdminPage = async function() {
                 renderCompaniesTable();
                 showToast('✅ 管理者権限で自動ログインしました', 'success');
                 return;
+            } else {
+                console.log('User is not in admin list');
             }
         } catch (e) {
-            console.log('Auto-admin check failed:', e.message);
+            console.error('Auto-admin check error:', e.code, e.message);
+            // Permission deniedの場合は、セキュリティルール不足の可能性
+            if (e.code === 'PERMISSION_DENIED') {
+                console.warn('⚠️ Database permission denied. Check Firestore rules.');
+                document.getElementById('admin-login-screen').style.display = 'block';
+                document.getElementById('admin-panel').style.display = 'none';
+                document.getElementById('admin-login-error').textContent = 'データベースアクセス権限がありません。管理者に確認してください。';
+                return;
+            }
         }
         
         // 管理者権限なし → ログイン画面表示
@@ -1445,8 +1457,20 @@ window.loginAsAdmin = async function() {
         const adminUser = userCred.user;
         
         // DBの管理者リストをチェック
+        console.log('Checking admin status for:', adminUser.uid);
         const adminRef = dbRef(db, `admins/${adminUser.uid}`);
-        const adminSnapshot = await get(adminRef);
+        let adminSnapshot;
+        try {
+            adminSnapshot = await get(adminRef);
+        } catch (dbError) {
+            console.error('Database error during admin check:', dbError.code, dbError.message);
+            if (dbError.code === 'PERMISSION_DENIED') {
+                errEl.textContent = 'データベースアクセス権限がありません。Firebaseのセキュリティルールを確認してください。';
+                await signOut(auth);
+                return;
+            }
+            throw dbError;
+        }
         
         if (!adminSnapshot.exists()) {
             errEl.textContent = `このアカウント(${email})は管理者権限がありません`;

@@ -1404,19 +1404,8 @@ window.loginAsAdmin = async function() {
     try {
         // Firebase Authでログイン
         const userCred = await signInWithEmailAndPassword(auth, email, pass);
-        const adminUser = userCred.user;
         
-        // 管理者権限チェック
-        const isSystemAdmin = ADMIN_UIDS.includes(adminUser.uid);
-        
-        if (!isSystemAdmin) {
-            errEl.textContent = `このアカウント(${email})は管理者権限がありません`;
-            // ログアウト
-            await signOut(auth);
-            return;
-        }
-        
-        // 管理者権限あり → パネル表示
+        // 認証成功 → パネル表示
         isAdmin = true;
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';

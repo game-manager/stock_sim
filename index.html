@@ -240,7 +240,19 @@
         .stock-holding-badge .holding-icon { font-size: 10px; }
  
         .stock-actions {
-            display: flex; gap: 8px;
+            display: flex; gap: 8px; margin-top: 12px;
+        }
+        .trade-input-group {
+            display: flex; gap: 4px; align-items: center; width: 100%;
+        }
+        .trade-input-group input {
+            flex: 1; padding: 6px 8px;
+            background: #0f172a; border: 1px solid #1e293b;
+            border-radius: 4px; color: #e0e8f0;
+            font-size: 12px;
+        }
+        .trade-input-group input:focus {
+            outline: none; border-color: #3b82f6;
         }
         .buy-btn, .sell-btn {
             flex: 1; padding: 8px 0;
@@ -2218,8 +2230,14 @@ function renderMarket() {
             </div>
             <div class="mini-chart">${buildMiniChart(hist)}</div>
             <div class="stock-actions">
-                <button class="buy-btn" data-id="${s.id}">買う</button>
-                <button class="sell-btn" data-id="${s.id}">売る</button>
+                <div class="trade-input-group">
+                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="buy" placeholder="数量" min="1" value="1">
+                    <button class="buy-btn" data-id="${s.id}">買う</button>
+                </div>
+                <div class="trade-input-group">
+                    <input type="number" class="trade-amount-input" data-id="${s.id}" data-type="sell" placeholder="数量" min="1" value="1">
+                    <button class="sell-btn" data-id="${s.id}">売る</button>
+                </div>
             </div>
         `;
         if (isEvent) {
@@ -2232,13 +2250,19 @@ function renderMarket() {
     grid.querySelectorAll('.buy-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            openModal('buy', btn.dataset.id);
+            const stockId = btn.dataset.id;
+            const amountInput = btn.parentElement.querySelector('input[data-type="buy"]');
+            const amount = parseInt(amountInput.value) || 1;
+            executeTrade('buy', stockId, amount);
         });
     });
     grid.querySelectorAll('.sell-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            openModal('sell', btn.dataset.id);
+            const stockId = btn.dataset.id;
+            const amountInput = btn.parentElement.querySelector('input[data-type="sell"]');
+            const amount = parseInt(amountInput.value) || 1;
+            executeTrade('sell', stockId, amount);
         });
     });
 }

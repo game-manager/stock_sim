@@ -1287,6 +1287,30 @@ onAuthStateChanged(auth, async (user) => {
             set(adminRegRef, true).catch(err => console.log('Admin registration skipped:', err.message));
         }
         
+        // メールアドレスの自動同期：Firebase AuthのメールアドレスとDBのメールアドレスを比較して同期
+        try {
+            const userDataRef = dbRef(db, `stock_users/${user.uid}`);
+            const userSnapshot = await get(userDataRef);
+            
+            if (userSnapshot.exists()) {
+                const dbEmail = userSnapshot.val().email;
+                // Firebase AuthのメールアドレスがDBのメールアドレスと異なる場合、同期
+                if (user.email !== dbEmail) {
+                    console.log('Syncing email:', dbEmail, '->', user.email);
+                    await update(userDataRef, { email: user.email });
+                    
+                    // 管理者の場合は、adminsリストのメールアドレスも同期
+                    const adminRef = dbRef(db, `admins/${user.uid}`);
+                    const adminSnapshot = await get(adminRef);
+                    if (adminSnapshot.exists()) {
+                        await update(adminRef, { email: user.email });
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Email sync failed:', e.message);
+        }
+        
         // 管理者認証フラグをリセット（新規ログイン時は管理者パネルにアクセスできない）
         isAdmin = false;
         

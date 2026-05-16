@@ -92,6 +92,13 @@
         }
         .header-balance .yen { color: #f59e0b; font-size: 11px; margin-left: 2px; }
         .header-right { display: flex; align-items: center; gap: 12px; }
+        .admin-page-btn {
+            padding: 6px 14px; background: #7c3aed; color: #fff;
+            border: 1px solid #8b5cf6; border-radius: 6px;
+            font-size: 12px; font-weight: bold; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .admin-page-btn:hover { background: #8b5cf6; }
         .user-email { color: #6b7280; font-size: 12px; }
         .user-name-display {
             color: #e0e8f0; font-size: 13px; font-weight: bold;
@@ -130,6 +137,18 @@
         .content { padding: 20px 24px; max-width: 1200px; margin: 0 auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .admin-page { display: none; }
+        .admin-page.active { display: block; }
+        .admin-page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-to-game-btn {
+            padding: 8px 16px; background: #1e293b; color: #94a3b8;
+            border: 1px solid #334155; border-radius: 6px;
+            font-size: 12px; cursor: pointer; transition: all 0.2s;
+        }
+        .back-to-game-btn:hover { background: #334155; color: #e0e8f0; }
  
         /* ─── マーケット ─── */
         .market-header {
@@ -718,6 +737,7 @@
             <div id="admin-badge" class="admin-badge" style="display:none;">ADMIN</div>
             <div class="user-name-display" id="user-name-display"></div>
             <div class="user-email" id="user-email"></div>
+            <button class="admin-page-btn" onclick="openAdminPage()">管理者ページ</button>
             <button class="logout-btn" onclick="handleLogout()">ログアウト</button>
         </div>
     </div>
@@ -726,7 +746,6 @@
         <button class="tab-btn active" data-tab="market">マーケット</button>
         <button class="tab-btn" data-tab="portfolio">ポートフォリオ</button>
         <button class="tab-btn" data-tab="company">会社設立</button>
-        <button class="tab-btn" id="admin-tab" data-tab="admin">管理者</button>
     </div>
  
     <div class="content">
@@ -735,7 +754,6 @@
             <div class="market-header">
                 <h2>株式市場</h2>
                 <div class="market-header-right">
-                    <button class="admin-btn-market" id="admin-btn-market" onclick="openAdminAuthModal()">📊 企業管理</button>
                     <div class="market-time" id="market-time">更新中...</div>
                 </div>
             </div>
@@ -828,8 +846,8 @@
             </div>
         </div>
 
-        <!-- 管理者 -->
-        <div id="tab-admin" class="tab-content">
+        <!-- 管理者ページ -->
+        <div id="admin-page" class="admin-page">
             <!-- 未認証時 -->
             <div id="admin-login-screen" class="admin-login-box">
                 <div class="admin-login-icon">🔐</div>
@@ -851,9 +869,12 @@
 
             <!-- 認証済み -->
             <div id="admin-panel" class="admin-section" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2>管理者パネル</h2>
-                    <button class="logout-btn" onclick="logoutAdmin()">認証解除</button>
+                <div class="admin-page-header">
+                    <h2>管理者ページ</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button class="back-to-game-btn" onclick="backToMainTabs()">ゲームへ戻る</button>
+                        <button class="logout-btn" onclick="logoutAdmin()">認証解除</button>
+                    </div>
                 </div>
                 
                 <div class="admin-grid">
@@ -894,6 +915,46 @@
                             <input type="number" id="new-player-balance" value="10000000">
                         </div>
                         <button class="admin-btn" onclick="addPlayer()">プレイヤーを作成</button>
+                    </div>
+                </div>
+
+                <div class="admin-card" style="margin-bottom:30px;">
+                    <h3>企業管理</h3>
+                    <div style="margin-bottom:24px;">
+                        <h4 style="color:#e0e8f0;margin-bottom:16px;">企業を追加</h4>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
+                            <div class="admin-form-group">
+                                <label>企業名</label>
+                                <input type="text" id="new-company-name" placeholder="例: テック企業">
+                            </div>
+                            <div class="admin-form-group">
+                                <label>ティッカー</label>
+                                <input type="text" id="new-company-ticker" placeholder="例: TECH" maxlength="5" style="text-transform:uppercase;">
+                            </div>
+                            <div class="admin-form-group">
+                                <label>初期株価（円）</label>
+                                <input type="number" id="new-company-price" placeholder="5000" min="100">
+                            </div>
+                        </div>
+                        <button class="admin-btn" onclick="addCompanyFromAdmin()" style="width:100%;">企業を追加</button>
+                    </div>
+
+                    <div>
+                        <h4 style="color:#e0e8f0;margin-bottom:16px;">既存企業一覧</h4>
+                        <table class="companies-table">
+                            <thead>
+                                <tr>
+                                    <th>企業名</th>
+                                    <th>ティッカー</th>
+                                    <th>初期株価</th>
+                                    <th>種類</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="companies-body">
+                                <tr><td colspan="5" style="text-align:center;color:#6b7280;padding:32px;">企業データを読み込み中...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -970,71 +1031,6 @@
     </div>
 </div>
 
-<!-- ===== 管理者パスワード認証モーダル（企業管理用） ===== -->
-<div class="admin-auth-modal-overlay" id="admin-auth-modal">
-    <div class="admin-auth-modal">
-        <div class="admin-auth-icon">🔐</div>
-        <div class="admin-auth-title">企業管理</div>
-        <div class="admin-auth-desc">管理者パスワードを入力してください</div>
-        <div class="admin-auth-form">
-            <input type="password" id="admin-auth-password" placeholder="パスワード" onkeypress="if(event.key==='Enter') confirmAdminAuth()">
-        </div>
-        <div id="admin-auth-error" style="color:#f87171;font-size:12px;margin-bottom:12px;min-height:18px;"></div>
-        <div class="admin-auth-btns">
-            <button class="admin-auth-cancel" onclick="closeAdminAuthModal()">キャンセル</button>
-            <button class="admin-auth-confirm" onclick="confirmAdminAuth()">認証</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== 企業管理画面モーダル ===== -->
-<div class="modal-overlay" id="company-management-modal" style="z-index:201;">
-    <div class="modal" style="max-width:900px;max-height:90vh;overflow-y:auto;">
-        <h3 style="color:#7c3aed;margin-bottom:20px;">📊 企業管理</h3>
-        
-        <div style="margin-bottom:30px;">
-            <h4 style="color:#e0e8f0;margin-bottom:16px;">企業を追加</h4>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
-                <div class="admin-form-group">
-                    <label>企業名</label>
-                    <input type="text" id="new-company-name" placeholder="例: テック企業">
-                </div>
-                <div class="admin-form-group">
-                    <label>ティッカー</label>
-                    <input type="text" id="new-company-ticker" placeholder="例: TECH" maxlength="5" style="text-transform:uppercase;">
-                </div>
-                <div class="admin-form-group">
-                    <label>初期株価（円）</label>
-                    <input type="number" id="new-company-price" placeholder="5000" min="100">
-                </div>
-            </div>
-            <button class="admin-btn" onclick="addCompanyFromAdmin()" style="width:100%;">企業を追加</button>
-        </div>
-
-        <div>
-            <h4 style="color:#e0e8f0;margin-bottom:16px;">既存企業一覧</h4>
-            <table class="companies-table">
-                <thead>
-                    <tr>
-                        <th>企業名</th>
-                        <th>ティッカー</th>
-                        <th>初期株価</th>
-                        <th>種類</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="companies-body">
-                    <tr><td colspan="5" style="text-align:center;color:#6b7280;padding:32px;">企業データを読み込み中...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div style="margin-top:20px;text-align:right;">
-            <button class="modal-cancel" onclick="closeCompanyManagementModal()" style="width:auto;">閉じる</button>
-        </div>
-    </div>
-</div>
- 
 <!-- トースト -->
 <div class="toast" id="toast"></div>
  
@@ -1306,19 +1302,37 @@ function updateUsernameDisplay() {
     document.getElementById('user-name-display').textContent = currentUsername || '名無しプレイヤー';
 }
 
-/* ─── タブ切り替え ─── */
+/* ─── タブ・管理者ページ切り替え ─── */
+function showGameTab(tab) {
+    document.getElementById('admin-page').classList.remove('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (btn) btn.classList.add('active');
+    document.getElementById(`tab-${tab}`).classList.add('active');
+
+    if (tab === 'portfolio') updatePortfolio();
+}
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(`tab-${tab}`).classList.add('active');
-        
-        if (tab === 'portfolio') updatePortfolio();
-        if (tab === 'admin' && isAdmin) loadAllPlayers();
-    });
+    btn.addEventListener('click', () => showGameTab(btn.dataset.tab));
 });
+
+window.openAdminPage = function() {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('admin-page').classList.add('active');
+
+    if (isAdmin) {
+        loadAllPlayers();
+        renderCompaniesTable();
+    }
+};
+
+window.backToMainTabs = function() {
+    showGameTab('market');
+};
 
 /* ─── 会社設立 ─── */
 window.createCompany = async function() {
@@ -1364,7 +1378,7 @@ window.createCompany = async function() {
     }
 };
 
-/* ─── 管理者認証（タブ内） ─── */
+/* ─── 管理者認証（管理者ページ内） ─── */
 window.loginAsAdmin = function() {
     const email = document.getElementById('admin-login-email').value.trim();
     const pass = document.getElementById('admin-login-password').value;
@@ -1375,6 +1389,7 @@ window.loginAsAdmin = function() {
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
         loadAllPlayers();
+        renderCompaniesTable();
         showToast('✅ 管理者として認証されました', 'success');
     } else {
         errEl.textContent = 'メールアドレスまたはパスワードが正しくありません';
@@ -1388,36 +1403,7 @@ window.logoutAdmin = function() {
     showToast('認証を解除しました', 'info');
 };
 
-/* ─── 管理者企業管理（モーダル用） ─── */
-window.openAdminAuthModal = function() {
-    document.getElementById('admin-auth-password').value = '';
-    document.getElementById('admin-auth-error').textContent = '';
-    document.getElementById('admin-auth-modal').classList.add('show');
-};
-
-window.closeAdminAuthModal = function() {
-    document.getElementById('admin-auth-modal').classList.remove('show');
-};
-
-window.confirmAdminAuth = function() {
-    const pass = document.getElementById('admin-auth-password').value;
-    if (pass === ADMIN_PASSWORD) {
-        closeAdminAuthModal();
-        openCompanyManagementModal();
-    } else {
-        document.getElementById('admin-auth-error').textContent = 'パスワードが違います';
-    }
-};
-
-window.openCompanyManagementModal = async function() {
-    document.getElementById('company-management-modal').classList.add('show');
-    renderCompaniesTable();
-};
-
-window.closeCompanyManagementModal = function() {
-    document.getElementById('company-management-modal').classList.remove('show');
-};
-
+/* ─── 管理者ページ内の企業管理 ─── */
 function renderCompaniesTable() {
     const body = document.getElementById('companies-body');
     const rows = [];

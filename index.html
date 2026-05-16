@@ -693,6 +693,40 @@
         .event-body { font-size: 13px; line-height: 1.5; }
         .event-impact { font-size: 11px; color: #9ca3af; margin-top: 8px; font-style: italic; }
 
+
+        /* ─── 設定画面 ─── */
+        .settings-card {
+            background: #111827; border: 1px solid #1e293b;
+            border-radius: 12px; padding: 24px;
+            margin-bottom: 24px;
+        }
+        .settings-card .form-group {
+            margin-bottom: 16px;
+        }
+        .settings-card label {
+            display: block; color: #94a3b8; font-size: 12px;
+            margin-bottom: 8px; font-weight: 600;
+        }
+        .settings-card input {
+            width: 100%; padding: 10px 12px;
+            background: #0f172a; border: 1px solid #1e293b;
+            border-radius: 6px; color: #e0e8f0;
+            font-size: 14px; transition: all 0.2s;
+        }
+        .settings-card input:focus {
+            outline: none; border-color: #3b82f6;
+            box-shadow: 0 0 0 3px #3b82f633;
+        }
+        .settings-btn {
+            margin-top: 8px; padding: 8px 16px;
+            background: #3b82f6; color: #fff;
+            border: none; border-radius: 6px;
+            font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .settings-btn:hover { background: #2563eb; }
+        .settings-btn:active { transform: scale(0.98); }
+
     </style>
 </head>
 <body>
@@ -746,6 +780,7 @@
         <button class="tab-btn active" data-tab="market">マーケット</button>
         <button class="tab-btn" data-tab="portfolio">ポートフォリオ</button>
         <button class="tab-btn" data-tab="company">会社設立</button>
+        <button class="tab-btn" data-tab="settings">設定</button>
     </div>
  
     <div class="content">
@@ -1319,6 +1354,148 @@ function updateUsernameDisplay() {
     document.getElementById('user-name-display').textContent = currentUsername || '名無しプレイヤー';
 }
 
+/* ─── プロフィール編集機能 ─── */
+window.initSettingsTab = function() {
+    if (currentUser && currentUsername) {
+        document.getElementById('settings-username').value = currentUsername;
+        document.getElementById('settings-email').value = currentUser.email;
+    }
+};
+
+window.updateUsername = async function() {
+    const newUsername = document.getElementById('settings-username').value.trim();
+    const msgEl = document.getElementById('settings-username-msg');
+    msgEl.textContent = '';
+    
+    if (!newUsername) {
+        msgEl.textContent = '❌ ユーザー名を入力してください';
+        msgEl.style.color = '#f87171';
+        return;
+    }
+    
+    if (newUsername.length > 20) {
+        msgEl.textContent = '❌ ユーザー名は20文字以内です';
+        msgEl.style.color = '#f87171';
+        return;
+    }
+    
+    try {
+        msgEl.textContent = '更新中...';
+        msgEl.style.color = '#3b82f6';
+        
+        currentUsername = newUsername;
+        await update(dbRef(db, `stock_users/${currentUser.uid}`), {
+            username: newUsername
+        });
+        
+        updateUsernameDisplay();
+        msgEl.textContent = '✅ ユーザー名を更新しました';
+        msgEl.style.color = '#34d399';
+    } catch (e) {
+        msgEl.textContent = '❌ 更新に失敗しました: ' + e.message;
+        msgEl.style.color = '#f87171';
+    }
+};
+
+window.updateEmail = async function() {
+    const newEmail = document.getElementById('settings-email').value.trim();
+    const msgEl = document.getElementById('settings-email-msg');
+    msgEl.textContent = '';
+    
+    if (!newEmail) {
+        msgEl.textContent = '❌ メールアドレスを入力してください';
+        msgEl.style.color = '#f87171';
+        return;
+    }
+    
+    if (!newEmail.includes('@')) {
+        msgEl.textContent = '❌ 有効なメールアドレスを入力してください';
+        msgEl.style.color = '#f87171';
+        return;
+    }
+    
+    if (newEmail === currentUser.email) {
+        msgEl.textContent = '⚠️ 新しいメールアドレスが現在のメールと同じです';
+        msgEl.style.color = '#f59e0b';
+        return;
+    }
+    
+    try {
+        msgEl.textContent = '更新中...';
+        msgEl.style.color = '#3b82f6';
+        
+        // Firebase Authのメールアドレスを更新
+        await updateEmail(currentUser, newEmail);
+        
+        // DBのメールアドレスも更新
+        await update(dbRef(db, `stock_users/${currentUser.uid}`), {
+            email: newEmail
+        });
+        
+        document.getElementById('user-email').textContent = newEmail;
+        msgEl.textContent = '✅ メールアドレスを更新しました';
+        msgEl.style.color = '#34d399';
+    } catch (e) {
+        const msgs = {
+            'auth/email-already-in-use': 'このメールアドレスは既に使用されています',
+            'auth/invalid-email': 'メールアドレスの形式が正しくありません',
+            'auth/requires-recent-login': 'セキュリティ上の理由により、再度ログインしてください',
+        };
+        msgEl.textContent = '❌ ' + (msgs[e.code] || e.message);
+        msgEl.style.color = '#f87171';
+    }
+};
+
+window.updatePassword = async function() {
+    const currentPass = document.getElementById('settings-current-password').value;
+    const newPass = document.getElementById('settings-new-password').value;
+    const msgEl = document.getElementById('settings-password-msg');
+    msgEl.textContent = '';
+    
+    if (!currentPass || !newPass) {
+        msgEl.textContent = '❌ 現在のパスワードと新しいパスワードを入力してください';
+        msgEl.style.color = '#f87171';
+        return;
+    }
+    
+    if (newPass.length < 6) {
+        msgEl.textContent = '❌ 新しいパスワードは6文字以上です';
+        msgEl.style.color = '#f87171';
+        return;
+    }
+    
+    if (currentPass === newPass) {
+        msgEl.textContent = '⚠️ 新しいパスワードが現在のパスワードと同じです';
+        msgEl.style.color = '#f59e0b';
+        return;
+    }
+    
+    try {
+        msgEl.textContent = '更新中...';
+        msgEl.style.color = '#3b82f6';
+        
+        // 現在のパスワードで再認証
+        const credential = EmailAuthProvider.credential(currentUser.email, currentPass);
+        await reauthenticateWithCredential(currentUser, credential);
+        
+        // 新しいパスワードに変更
+        await updatePassword(currentUser, newPass);
+        
+        document.getElementById('settings-current-password').value = '';
+        document.getElementById('settings-new-password').value = '';
+        msgEl.textContent = '✅ パスワードを変更しました';
+        msgEl.style.color = '#34d399';
+    } catch (e) {
+        const msgs = {
+            'auth/wrong-password': '現在のパスワードが正しくありません',
+            'auth/weak-password': 'パスワードをもっと強くしてください',
+            'auth/requires-recent-login': 'セキュリティ上の理由により、再度ログインしてください',
+        };
+        msgEl.textContent = '❌ ' + (msgs[e.code] || e.message);
+        msgEl.style.color = '#f87171';
+    }
+};
+
 /* ─── タブ・管理者ページ切り替え ─── */
 function showGameTab(tab) {
     document.getElementById('admin-page').classList.remove('active');
@@ -1330,6 +1507,7 @@ function showGameTab(tab) {
     document.getElementById(`tab-${tab}`).classList.add('active');
 
     if (tab === 'portfolio') updatePortfolio();
+    if (tab === 'settings') window.initSettingsTab();
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn => {

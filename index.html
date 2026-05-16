@@ -1200,11 +1200,22 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('main-screen').style.display = 'block';
         document.getElementById('user-email').textContent = user.email;
         
-        // ヘッダーの管理者バッジ表示（管理者権限がある場合）
-        const isSystemAdmin = ADMIN_UIDS.includes(user.uid);
-        if (isSystemAdmin) {
-            document.getElementById('admin-badge').style.display = 'inline-block';
+        // ヘッダーの管理者バッジ表示（DBの管理者リストをチェック）
+        const adminRef = dbRef(db, `admins/${user.uid}`);
+        onValue(adminRef, (snapshot) => {
+            if (snapshot.exists()) {
+                document.getElementById('admin-badge').style.display = 'inline-block';
+            } else {
+                document.getElementById('admin-badge').style.display = 'none';
+            }
+        });
+        
+        // 初期管理者をDBに登録（ADMIN_UIDSに含まれる場合）
+        if (ADMIN_UIDS.includes(user.uid)) {
+            const adminRegRef = dbRef(db, `admins/${user.uid}`);
+            set(adminRegRef, true).catch(err => console.log('Admin registration skipped:', err.message));
         }
+        
         // 管理者認証フラグをリセット（新規ログイン時は管理者パネルにアクセスできない）
         isAdmin = false;
         
@@ -1389,7 +1400,7 @@ window.createCompany = async function() {
     }
 };
 
-/* ─── 管理者認証（Firebase Authベース） ─── */
+/* ─── 管理者認証（Firebase Authベース + DBチェック） ─── */
 window.loginAsAdmin = async function() {
     const email = document.getElementById('admin-login-email').value.trim();
     const pass = document.getElementById('admin-login-password').value;
@@ -1404,8 +1415,19 @@ window.loginAsAdmin = async function() {
     try {
         // Firebase Authでログイン
         const userCred = await signInWithEmailAndPassword(auth, email, pass);
+        const adminUser = userCred.user;
         
-        // 認証成功 → パネル表示
+        // DBの管理者リストをチェック
+        const adminRef = dbRef(db, `admins/${adminUser.uid}`);
+        const adminSnapshot = await get(adminRef);
+        
+        if (!adminSnapshot.exists()) {
+            errEl.textContent = `このアカウント(${email})は管理者権限がありません`;
+            await signOut(auth);
+            return;
+        }
+        
+        // 管理者権限あり → パネル表示
         isAdmin = true;
         document.getElementById('admin-login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';

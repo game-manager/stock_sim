@@ -1127,7 +1127,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
     getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
     signOut, onAuthStateChanged, updateEmail, updatePassword,
-    EmailAuthProvider, reauthenticateWithCredential
+    EmailAuthProvider, reauthenticateWithCredential, verifyBeforeUpdateEmail
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
     getDatabase, ref as dbRef, set, get, push, onValue, update
@@ -1453,29 +1453,15 @@ window.updateEmail = async function() {
     }
     
     try {
-        msgEl.textContent = '更新中...';
+        msgEl.textContent = '確認メールを送信中...';
         msgEl.style.color = '#3b82f6';
         
-        // Firebase Authのメールアドレスを更新
-        await updateEmail(currentUser, newEmail);
+        // 新しいメールアドレスに確認メールを送信
+        await verifyBeforeUpdateEmail(currentUser, newEmail);
         
-        // DBのメールアドレスも更新
-        await update(dbRef(db, `stock_users/${currentUser.uid}`), {
-            email: newEmail
-        });
-        
-        // 管理者の場合は、adminsリストのメールアドレスも更新
-        const adminRef = dbRef(db, `admins/${currentUser.uid}`);
-        const adminSnapshot = await get(adminRef);
-        if (adminSnapshot.exists()) {
-            await update(adminRef, {
-                email: newEmail
-            });
-        }
-        
-        document.getElementById('user-email').textContent = newEmail;
-        msgEl.textContent = '✅ メールアドレスを更新しました';
+        msgEl.textContent = '✅ 確認メールを送信しました。新しいメールアドレスのメールボックスを確認して、確認リンクをクリックしてください。';
         msgEl.style.color = '#34d399';
+        document.getElementById('settings-email').value = '';
     } catch (e) {
         const msgs = {
             'auth/email-already-in-use': 'このメールアドレスは既に使用されています',

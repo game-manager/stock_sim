@@ -1372,7 +1372,7 @@ window.handleAuth = async function() {
             await set(dbRef(db, `stock_users/${cred.user.uid}`), {
                 username: username,
                 email: email,
-                balance: 10000000,
+                balance: 2000000,
                 holdings: {},
                 lastBonusDate: null,
             });
@@ -1395,7 +1395,7 @@ window.handleLogout = async function() {
 };
  
 function resetUserState() {
-    balance       = 10000000;
+    balance       = 2000000;
     holdings      = {};
     tradeHistory  = [];
     userCompany   = null;
@@ -1498,7 +1498,7 @@ function loadFromLocalStorage() {
     if (raw) {
         try {
             const data = JSON.parse(raw);
-            balance      = data.balance ?? 10000000;
+            balance      = data.balance ?? 2000000;
             holdings     = data.holdings ?? {};
             tradeHistory = data.history ?? [];
             lastBonusDate = data.lastBonusDate || null;
@@ -1516,7 +1516,7 @@ async function loadUserData() {
     const snap = await get(dbRef(db, `stock_users/${uid}`));
     if (snap.exists()) {
         const data = snap.val();
-        balance = data.balance ?? 10000000;
+        balance = data.balance ?? 2000000;
         holdings = data.holdings ?? {};
         tradeHistory = data.history ? Object.values(data.history) : [];
         lastBonusDate = data.lastBonusDate || null;

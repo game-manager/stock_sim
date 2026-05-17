@@ -1101,8 +1101,8 @@
                     <div class="admin-card">
                         <h3>警告送信</h3>
                         <div class="admin-form-group">
-                            <label>対象プレイヤーUID</label>
-                            <input type="text" id="warn-player-uid" placeholder="UIDを入力">
+                            <label>対象プレイヤーのメールアドレス</label>
+                            <input type="text" id="warn-player-email" placeholder="example@mail.com">
                         </div>
                         <div class="admin-form-group">
                             <label>警告メッセージ</label>
@@ -2067,21 +2067,40 @@ window.openWarnForm = function(uid, name) {
 window.showPlayerWarning = async function() {
     if (!isAdmin) { showToast('管理者認証が必要です', 'error'); return; }
     
-    const uid = document.getElementById('warn-player-uid').value.trim();
+    const email = document.getElementById('warn-player-email').value.trim();
     const message = document.getElementById('warn-message').value.trim();
     
-    if (!uid) { showToast('プレイヤーUIDを入力してください', 'error'); return; }
+    if (!email) { showToast('メールアドレスを入力してください', 'error'); return; }
     if (!message) { showToast('警告メッセージを入力してください', 'error'); return; }
     
     try {
-        await set(dbRef(db, `warnings/${uid}`), {
+        // 全プレイヤーデータを取得してメールアドレスからUIDを探す
+        const usersSnap = await get(dbRef(db, 'stock_users'));
+        const users = usersSnap.val();
+        let targetUid = null;
+        
+        if (users) {
+            for (const uid in users) {
+                if (users[uid].email === email) {
+                    targetUid = uid;
+                    break;
+                }
+            }
+        }
+        
+        if (!targetUid) {
+            showToast('該当するメールアドレスのプレイヤーが見つかりません', 'error');
+            return;
+        }
+        
+        await set(dbRef(db, `warnings/${targetUid}`), {
             message: message,
             timestamp: Date.now(),
             adminUid: currentUser.uid,
         });
         
         showToast(`⚠️ 警告を送信しました`, 'success');
-        document.getElementById('warn-player-uid').value = '';
+        document.getElementById('warn-player-email').value = '';
         document.getElementById('warn-message').value = '';
     } catch (e) {
         showToast('警告送信に失敗しました: ' + e.message, 'error');

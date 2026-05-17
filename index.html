@@ -1600,9 +1600,10 @@ onAuthStateChanged(auth, async (user) => {
         // ユーザーデータのリアルタイム同期
         const userDataRef = dbRef(db, `stock_users/${user.uid}`);
         onValue(userDataRef, (snapshot) => {
+            if (isSaving) return; // 保存中は同期をスキップして競合を防ぐ
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                balance = data.balance ?? 10000000;
+                balance = Number(data.balance) ?? 10000000;
                 holdings = data.holdings ?? {};
                 tradeHistory = data.history ? Object.values(data.history) : [];
                 lastBonusDate = data.lastBonusDate || null;
@@ -1693,19 +1694,25 @@ async function loadUserData() {
 }
 
 async function saveUserData() {
-    if (!currentUser) return;
+    if (!currentUser || isSaving) return;
+    isSaving = true;
     const uid = currentUser.uid;
     try {
-        await update(dbRef(db, `stock_users/${uid}`), {
-            balance, holdings,
+        const dataToSave = {
+            balance: Number(balance),
+            holdings,
             lastBonusDate,
             username: currentUsername,
             bankData: bankData
-        });
+        };
+        await update(dbRef(db, `stock_users/${uid}`), dataToSave);
         saveToLocalStorage();
     } catch (e) {
         console.warn('Firebase save failed:', e.message);
         saveToLocalStorage();
+    } finally {
+        // 少し遅延させてから解除（Firebaseの反映待ち）
+        setTimeout(() => { isSaving = false; }, 1000);
     }
 }
 

@@ -1705,8 +1705,12 @@ async function saveUserData() {
 }
 
 function updateBalanceDisplay() {
-    document.getElementById('header-balance').innerHTML =
-        `${balance.toLocaleString()}<span class="yen">円</span>`;
+    document.getElementById('header-balance').innerHTML = `${balance.toLocaleString()}<span class="yen">円</span>`;
+    if (document.getElementById('bank-deposit-amount')) {
+        document.getElementById('bank-deposit-amount').textContent = `¥${(bankData.deposit || 0).toLocaleString()}`;
+        document.getElementById('bank-loan-amount').textContent = `¥${(bankData.loan || 0).toLocaleString()}`;
+        renderLoanStatus();
+    }
 }
 
 function updateUsernameDisplay() {
@@ -1984,9 +1988,10 @@ window.approveLoan = async function(uid) {
         const u = snapshot.val();
         
         if (u.bankData && u.bankData.loanRequest) {
-            const amount = u.bankData.loanRequest.amount;
-            u.balance += amount;
-            u.bankData.loan += amount;
+            const amount = parseInt(u.bankData.loanRequest.amount);
+            if (!u.bankData.loan) u.bankData.loan = 0;
+            u.balance = (parseInt(u.balance) || 0) + amount;
+            u.bankData.loan = (parseInt(u.bankData.loan) || 0) + amount;
             u.bankData.loanRequest.status = 'approved';
             
             await update(userRef, {

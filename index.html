@@ -1088,8 +1088,8 @@
                     <div class="admin-card">
                         <h3>プレイヤー検索・操作</h3>
                         <div class="admin-form-group">
-                            <label>プレイヤーUID</label>
-                            <input type="text" id="adjust-player-uid" placeholder="UIDを入力">
+                            <label>プレイヤーのメールアドレス</label>
+                            <input type="text" id="adjust-player-email" placeholder="example@mail.com">
                         </div>
                         <div class="admin-form-group">
                             <label>残高増減額（円）</label>
@@ -2032,25 +2032,42 @@ window.addPlayer = async function() {
 window.adjustPlayerBalance = async function() {
     if (!isAdmin) { showToast('管理者認証が必要です', 'error'); return; }
     
-    const uid = document.getElementById('adjust-player-uid').value.trim();
+    const email = document.getElementById('adjust-player-email').value.trim();
     const amount = parseInt(document.getElementById('adjust-amount').value);
     
-    if (!uid) { showToast('プレイヤーUIDを入力してください', 'error'); return; }
+    if (!email) { showToast('メールアドレスを入力してください', 'error'); return; }
     if (isNaN(amount)) { showToast('増減額を入力してください', 'error'); return; }
     
     try {
-        const snap = await get(dbRef(db, `stock_users/${uid}`));
-        if (!snap.exists()) { showToast('プレイヤーが見つかりません', 'error'); return; }
+        // 全プレイヤーデータを取得してメールアドレスからUIDを探す
+        const usersSnap = await get(dbRef(db, 'stock_users'));
+        const users = usersSnap.val();
+        let targetUid = null;
+        let userData = null;
         
-        const data = snap.val();
-        const currentBalance = data.balance ?? 10000000;
+        if (users) {
+            for (const uid in users) {
+                if (users[uid].email === email) {
+                    targetUid = uid;
+                    userData = users[uid];
+                    break;
+                }
+            }
+        }
+        
+        if (!targetUid) {
+            showToast('該当するメールアドレスのプレイヤーが見つかりません', 'error');
+            return;
+        }
+        
+        const currentBalance = userData.balance ?? 10000000;
         const newBalance = Math.max(0, currentBalance + amount);
         
-        await update(dbRef(db, `stock_users/${uid}`), { balance: newBalance });
+        await update(dbRef(db, `stock_users/${targetUid}`), { balance: newBalance });
         
         const amountStr = amount >= 0 ? `+¥${amount.toLocaleString()}` : `-¥${Math.abs(amount).toLocaleString()}`;
         showToast(`✅ 残高を調整しました (${amountStr})`, 'success');
-        document.getElementById('adjust-player-uid').value = '';
+        document.getElementById('adjust-player-email').value = '';
         document.getElementById('adjust-amount').value = '';
         await window.loadAllPlayers();
     } catch (e) {

@@ -1539,6 +1539,11 @@ function resetUserState() {
     currentUsername = '';
     activeMultipliers = {};
     isAdmin = false;
+    bankData = {
+        deposit: 0,
+        loan: 0,
+        loanRequest: null
+    };
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -2561,10 +2566,12 @@ function tickPrices() {
         bankData.loan = Math.floor(bankData.loan * 1.005);
         changed = true;
     }
-    if (changed) {
-        // saveUserData を直接呼ぶと他のフィールドも上書きするので注意が必要だが、
-        // リアルタイム同期中なので、現在のローカル変数は最新のはず。
-        saveUserData();
+    if (changed && currentUser) {
+        update(dbRef(db, `stock_users/${currentUser.uid}/bankData`), {
+            deposit: bankData.deposit,
+            loan: bankData.loan
+        });
+        saveToLocalStorage();
     }
 
 }
